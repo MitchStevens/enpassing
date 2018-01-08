@@ -1,0 +1,5 @@
+Blues1
+Key: Bb
+| Bb7 | Bb7 | Bb7 | Bb7 |
+| Eb7 | Eb7 | Bb7 | Bb7 |
+| F7  | Eb7 | Bb7 | F7  |

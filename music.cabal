@@ -1,0 +1,34 @@
+name:                music
+
+-- The package version.  See the Haskell package versioning policy (PVP)
+-- for standards guiding when and how versions should be incremented.
+-- https://wiki.haskell.org/Package_versioning_policy
+-- PVP summary:      +-+------- breaking API changes
+--                   | | +----- non-breaking API additions
+--                   | | | +--- code changes with no API change
+version:             0.1.0.0
+license:             BSD3
+license-file:        LICENSE
+author:              Mitch Stevens
+maintainer:          mitchstevens95@gmail.com
+category:            Music
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+executable music
+  main-is:             Main.hs
+  build-depends:       base >=4.9 && <4.10, comonad, containers, deepseq,
+                       Euterpea, QuickCheck, QuickCheck-GenT, mtl, parsec, unliftio, text
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  other-modules:       Enpassing.Music
+
+test-suite tests
+  type:                exitcode-stdio-1.0
+  main-is:             Test.hs
+  build-depends:       base >=4.9 && <4.10, comonad, containers, deepseq,
+                       Euterpea, QuickCheck, QuickCheck-GenT, mtl, parsec, unliftio, tasty, tasty-hunit, text
+  hs-source-dirs:      src, test
+  default-language:    Haskell2010
+  other-modules:       Enpassing.Music

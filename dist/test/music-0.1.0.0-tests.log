@@ -1,0 +1,94 @@
+Test suite tests: RUNNING...
+
+  Non IO Tests
+    Parser Tests
+      Note Parsing Tests
+        C should parse to C:                                                                                        OK
+        C# should parse to Cs:                                                                                      OK
+        Db should parse to Df:                                                                                      OK
+        D should parse to D:                                                                                        OK
+        D# should parse to Ds:                                                                                      OK
+        Eb should parse to Ef:                                                                                      OK
+        E should parse to E:                                                                                        OK
+        F should parse to F:                                                                                        OK
+        F# should parse to Fs:                                                                                      OK
+        Gb should parse to Gf:                                                                                      OK
+        G should parse to G:                                                                                        OK
+        G# should parse to Gs:                                                                                      OK
+        Ab should parse to Af:                                                                                      OK
+        A should parse to A:                                                                                        OK
+        A# should parse to As:                                                                                      OK
+        Bb should parse to Bf:                                                                                      OK
+        B should parse to B:                                                                                        OK
+      Quality Parsing Tests
+        M should parse to maj:                                                                                      OK
+        Maj should parse to maj:                                                                                    OK
+        maj should parse to maj:                                                                                    OK
+        m should parse to m:                                                                                        OK
+        Min should parse to m:                                                                                      OK
+        min should parse to m:                                                                                      OK
+        - should parse to m:                                                                                        OK
+        dom should parse to :                                                                                       OK
+         should parse to :                                                                                          OK
+        aug should parse to +:                                                                                      OK
+        + should parse to +:                                                                                        OK
+        dim should parse to o:                                                                                      OK
+        o should parse to o:                                                                                        OK
+      Chord Parsing Tests
+        Cmaj should parse to Cmaj:                                                                                  OK
+        Cmaj7 should parse to Cmaj7:                                                                                OK
+        AM9 should parse to Amaj7(add9):                                                                            OK
+    Testing the pitches in a Chord
+      Major Chords
+        A chord Cmaj should produce the pitches [(C,4),(E,4),(G,4)]:                                                OK
+        A chord Cmaj7 should produce the pitches [(C,4),(E,4),(G,4),(B,4)]:                                         OK
+        A chord Cmaj7(add9) should produce the pitches [(C,4),(E,4),(G,4),(B,4),(D,5)]:                             OK
+        A chord Dmaj7 should produce the pitches [(D,4),(Fs,4),(A,4),(Cs,5)]:                                       OK
+        A chord Emaj7 should produce the pitches [(E,4),(Gs,4),(B,4),(Ds,5)]:                                       OK
+        A chord Fmaj7 should produce the pitches [(F,4),(A,4),(C,5),(E,5)]:                                         OK
+        A chord Gmaj7 should produce the pitches [(G,4),(B,4),(D,5),(Fs,5)]:                                        OK
+        A chord Dmaj7(add9)(add11)(add13) should produce the pitches [(D,4),(Fs,4),(A,4),(Cs,5),(E,5),(G,5),(B,5)]: OK
+      Minor Chords
+        A chord Am7 should produce the pitches [(A,4),(C,5),(E,5),(G,5)]:                                           OK
+        A chord Gm7 should produce the pitches [(G,4),(As,4),(D,5),(F,5)]:                                          OK
+        A chord Cm7 should produce the pitches [(C,4),(Ds,4),(G,4),(As,4)]:                                         OK
+        A chord F#m7(add9) should produce the pitches [(Fs,4),(A,4),(Cs,5),(E,5),(Gs,5)]:                           OK
+        A chord Bm7(b5) should produce the pitches [(B,4),(D,5),(F,5),(A,5)]:                                       OK
+        A chord Ebm7(add11)(b5) should produce the pitches [(Ds,4),(Fs,4),(A,4),(Cs,5),(Gs,5)]:                     OK
+      Diminished Chords
+        A chord Ao7 should produce the pitches [(A,4),(C,5),(Ds,5),(Fs,5)]:                                         OK
+        A chord Bbo7 should produce the pitches [(As,4),(Cs,5),(E,5),(G,5)]:                                        OK
+        A chord Bo7 should produce the pitches [(B,4),(D,5),(F,5),(Gs,5)]:                                          OK
+    Testing that scales are reproduced faithfully
+      Major Scales
+        Testing that the scale [(C,4),(D,4),(E,4),(F,4),(G,4),(A,4),(B,4)] can be produced from((C,4),Major):       OK
+        Testing that the scale [(G,4),(A,4),(B,4),(C,5),(D,5),(E,5),(Fs,5)] can be produced from((G,4),Major):      OK
+        Testing that the scale [(As,4),(C,5),(D,5),(Ds,5),(F,5),(G,5),(A,5)] can be produced from((As,4),Major):    OK
+      Minor Scales
+        Testing that the scale [(C,4),(D,4),(Ds,4),(F,4),(G,4),(Gs,4),(As,4)] can be produced from((C,4),Minor):    OK
+        Testing that the scale [(A,4),(B,4),(C,5),(D,5),(E,5),(F,5),(G,5)] can be produced from((A,4),Minor):       OK
+        Testing that the scale [(F,4),(G,4),(Gs,4),(As,4),(C,5),(Cs,5),(Ds,5)] can be produced from((F,4),Minor):   OK
+  IO Tests
+    Song: "Fly me to the Moon"
+      Has the correct number of bars:                                                                               OK
+      Bars all have duration 1
+        Bar 0 ([Note (1 % 1) Am7]) should have duration 1:                                                          OK
+        Bar 1 ([Note (1 % 1) Dm7]) should have duration 1:                                                          OK
+        Bar 2 ([Note (1 % 1) G7]) should have duration 1:                                                           OK
+        Bar 3 ([Note (1 % 1) Cmaj7]) should have duration 1:                                                        OK
+        Bar 4 ([Note (1 % 1) Fmaj7]) should have duration 1:                                                        OK
+        Bar 5 ([Note (1 % 1) Bm(b5)]) should have duration 1:                                                       OK
+        Bar 6 ([Note (1 % 1) E7]) should have duration 1:                                                           OK
+        Bar 7 ([Note (1 % 2) Am7,Note (1 % 2) A7]) should have duration 1:                                          OK
+        Bar 8 ([Note (1 % 1) Dm7]) should have duration 1:                                                          OK
+        Bar 9 ([Note (1 % 1) G7]) should have duration 1:                                                           OK
+        Bar 10 ([Note (1 % 1) Cmaj7]) should have duration 1:                                                       OK
+        Bar 11 ([Note (1 % 1) A7]) should have duration 1:                                                          OK
+        Bar 12 ([Note (1 % 1) Dm7]) should have duration 1:                                                         OK
+        Bar 13 ([Note (1 % 1) G7]) should have duration 1:                                                          OK
+        Bar 14 ([Note (1 % 1) Cmaj7]) should have duration 1:                                                       OK
+        Bar 15 ([Note (1 % 2) Bm(b5),Note (1 % 2) E(b9)]) should have duration 1:                                   OK
+
+All 73 tests passed (0.01s)
+Test suite tests: PASS
+Test suite logged to: dist\test\music-0.1.0.0-tests.log
