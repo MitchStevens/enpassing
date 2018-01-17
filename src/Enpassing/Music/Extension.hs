@@ -1,11 +1,12 @@
-{-# LANGUAGE DeriveFunctor, FlexibleInstances, DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric  #-}
 
 module Enpassing.Music.Extension where
 
-import Control.DeepSeq
-import GHC.Generics (Generic)
-import Test.QuickCheck
+import           Control.DeepSeq
+import           GHC.Generics    (Generic)
 
+{- An Extension is an extra note that can be added to a chord, to provide more colour or tension. If the note is all  -}
 data Extension = Sharp Int | Flat Int | Add Int -- | No a | Sus a
   deriving (Eq, Generic, NFData)
 
@@ -18,7 +19,3 @@ degree :: Extension -> Int
 degree (Sharp n) = n
 degree (Flat n)  = n
 degree (Add n)   = n
-
-instance Arbitrary Extension where
-  arbitrary = modifier <*> elements [7, 9, 11, 13]
-    where modifier = frequency $ zip [5, 2, 1] $ map pure [Add, Sharp, Flat]

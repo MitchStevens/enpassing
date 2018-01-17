@@ -7,9 +7,9 @@ module Enpassing.Playable (
   play_drum
 ) where
 
-import Euterpea.Music
+import           Enpassing.Music
 import qualified Euterpea.IO.MIDI.Play as MIDI
-import Enpassing.Music
+import           Euterpea.Music
 
 class Playable p where
   as_music :: p -> Music1
@@ -31,4 +31,4 @@ play_drum playable = MIDI.play . controls$ (toMusic1 drum_track) /=: (toMusic1 $
                          hihat = perc ClosedHiHat      qn
                      in forever $ (hihat :=: bass) :+: hihat :+: (hihat :=: snare) :+: hihat
 
-controls = Modify (Transpose 2) . Modify (Tempo 1.6) . Modify (Instrument PercussiveOrgan)
+controls = Modify (Tempo 1.0) . Modify (Instrument PercussiveOrgan)

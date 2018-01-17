@@ -18,17 +18,41 @@ cabal-version:       >=1.10
 
 executable music
   main-is:             Main.hs
-  build-depends:       base >=4.9 && <4.10, comonad, containers, deepseq,
-                       Euterpea, QuickCheck, QuickCheck-GenT, mtl, parsec, unliftio, text
+  build-depends:       base >=4.10 && <4.11,
+                       contravariant,
+                       comonad,
+                       containers,
+                       deepseq,
+                       Euterpea,
+                       QuickCheck,
+                       QuickCheck-GenT,
+                       mtl,
+                       parsec,
+                       unliftio,
+                       text,
+                       transformers
   hs-source-dirs:      src
   default-language:    Haskell2010
-  other-modules:       Enpassing.Music
+  other-modules:       Enpassing.Music, Enpassing.Changes
 
 test-suite tests
   type:                exitcode-stdio-1.0
   main-is:             Test.hs
-  build-depends:       base >=4.9 && <4.10, comonad, containers, deepseq,
-                       Euterpea, QuickCheck, QuickCheck-GenT, mtl, parsec, unliftio, tasty, tasty-hunit, text
+  build-depends:       base >=4.10 && <4.11, 
+                       contravariant, 
+                       comonad, 
+                       containers, 
+                       deepseq,
+                       Euterpea, 
+                       QuickCheck, 
+                       QuickCheck-GenT, 
+                       mtl, 
+                       parsec, 
+                       unliftio, 
+                       tasty, 
+                       tasty-hunit, 
+                       text, 
+                       transformers
   hs-source-dirs:      src, test
   default-language:    Haskell2010
   other-modules:       Enpassing.Music

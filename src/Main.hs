@@ -1,26 +1,29 @@
 module Main where
 
-import Euterpea hiding (play)
-import Enpassing.Music
-import Enpassing.Changes.Substitution
-import Parsers
-import Text.Parsec
-import Data.Text.IO as T
-import Data.Either
-import Enpassing.Playable
-import Control.Exception
-import UnliftIO.Exception
-import Test.QuickCheck.Gen
-import System.IO.Unsafe (unsafePerformIO)
+import           Control.Exception
+import           Data.Either
+import           Data.Functor.Compose
+import           Data.Text.IO                   as T
+import           Enpassing.Changes.Passing
+import           Enpassing.Changes.Substitution
+import           Enpassing.Music
+import           Enpassing.Playable
+import           Euterpea                       hiding (play)
+import           Parsers
+import           System.IO.Unsafe               (unsafePerformIO)
+import           Test.QuickCheck.Gen
+import           Text.Parsec
+import           UnliftIO.Exception
 
 io_sheet :: IO Sheet
-io_sheet = fromEitherM $ parse parse_sheet "" <$> T.readFile "res/fly_me_to_the_moon.txt" --"res/over_the_rainbow.txt"
+io_sheet = fromEitherM $ parse parse_sheet "" <$> T.readFile "res/but_not_for_me.txt" --"res/over_the_rainbow.txt"
 
 main :: IO ()
-main = no_subs
+main = with_additions
   where
     no_subs   = io_sheet >>= print
-    --with_subs = io_sheet >>= generate :: Sheet
+    with_subs = io_sheet >>= generate_substitutions >>= print_and_play
+    with_additions = io_sheet >>= generate_passing_chords >>= print_and_play
 
 print_and_play sheet = print sheet >> play_drum sheet
 

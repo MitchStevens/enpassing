@@ -2,12 +2,12 @@
 
 module Enpassing.Music.Key where
 
-import Control.Comonad
-import Euterpea.Music
+import           Control.Comonad
+import           Euterpea.Music
 
 type Key = (PitchClass, Mode)
 data Keyed a = Keyed Key a deriving (Functor)
 
-
-add_key :: Key -> a -> (Key, a)
-add_key = (,)
+instance Comonad Keyed where
+  extract (Keyed k x) = x
+  extend f keyed@(Keyed k _) =  Keyed k $ f keyed

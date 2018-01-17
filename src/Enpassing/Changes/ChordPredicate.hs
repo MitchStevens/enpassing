@@ -1,18 +1,23 @@
 module Enpassing.Changes.ChordPredicate where
 
-import Enpassing.Music
-import Euterpea.Music
+import           Data.Functor.Contravariant
+import           Data.Monoid
+import           Enpassing.Music
+import           Euterpea.Music
 
-type ChordPredicate = Chord -> Bool
+true :: Predicate Chord
+true = Predicate $ const True
 
-true :: Chord -> Bool
-true = const True
+false :: Predicate Chord
+false = Predicate $ const False
 
-false :: Chord -> Bool
-false = const False
+has_root :: PitchClass -> Predicate Chord
+has_root p1 = Predicate $ \(Chord p2 _ _) -> p1 == p2
 
-has_root :: PitchClass -> ChordPredicate
-has_root p1 (Chord p2 _ _) = p1 == p2
+has_qual :: Quality -> Predicate Chord
+has_qual q1 = Predicate $ \(Chord _ q2 _) -> q1 == q2
 
-has_qual :: Quality -> ChordPredicate
-has_qual q1 (Chord _ q2 _) = q1 == q2
+instance Monoid (Predicate m) where
+  mempty = Predicate $ \_ -> False
+  mappend (Predicate f1) (Predicate f2) = Predicate $ \x -> (f1 x || f2 x)
+
