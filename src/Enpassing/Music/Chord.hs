@@ -5,7 +5,8 @@ module Enpassing.Music.Chord (
   Quality (..),
   Chord (..),
   mk_chord,
-  to_pitches
+  to_pitches,
+  transpose_chord
 ) where
 
 import           Control.DeepSeq
@@ -15,7 +16,7 @@ import           Enpassing.Music.Extension
 import           Enpassing.Music.Interval
 import           Enpassing.Music.Key
 import           Enpassing.Music.Scale
-import           Euterpea
+import           Euterpea                  hiding (transpose)
 import           GHC.Generics              (Generic)
 import           Test.QuickCheck
 import           Test.QuickCheck.Gen
@@ -120,3 +121,6 @@ implicit_extensions (Add 9)  = [Add 7, Add 9]
 implicit_extensions (Add 11) = [Add 7, Add 9, Add 11]
 implicit_extensions (Add 13) = [Add 7, Add 9, Add 11, Add 13]
 implicit_extensions ext      = [ext]
+
+transpose_chord :: Int -> Chord -> Chord
+transpose_chord n (Chord root qual exts) = Chord (fst . pitch . (+1) . pcToInt $ root) qual exts

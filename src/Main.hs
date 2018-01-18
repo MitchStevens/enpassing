@@ -19,11 +19,11 @@ io_sheet :: IO Sheet
 io_sheet = fromEitherM $ parse parse_sheet "" <$> T.readFile "res/but_not_for_me.txt" --"res/over_the_rainbow.txt"
 
 main :: IO ()
-main = with_additions
+main = with_subs
   where
     no_subs   = io_sheet >>= print
     with_subs = io_sheet >>= generate_substitutions >>= print_and_play
-    with_additions = io_sheet >>= generate_passing_chords >>= print_and_play
+    --with_additions = io_sheet >>= generate_passing_chords >>= print_and_play
 
 print_and_play sheet = print sheet >> play_drum sheet
 

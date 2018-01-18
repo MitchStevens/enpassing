@@ -11,88 +11,114 @@ module Enpassing.Changes.Substitution (
 
 import           Control.Comonad
 import           Control.Monad
+import           Data.Algebra.Boolean
 import           Data.Functor.Compose
 import           Data.Functor.Contravariant
-import           Data.List                   (intersperse)
+import           Data.List                        (intercalate)
 import           Data.Maybe
-import           Data.Semigroup
+import           Data.Monoid
 import           Enpassing.Changes.ChordLike
+import           Enpassing.Changes.ChordPredicate as ChordPredicate
+import           Enpassing.Changes.Interpreted
 import           Enpassing.Music
 import           Euterpea.Music
+import           Prelude                          hiding (and, not, or, (&&),
+                                                   (||))
 import           Test.QuickCheck
-{-
+
 generate_substitutions :: Sheet -> IO Sheet
-generate_substitutions (Sheet name key bars) = generate $ Sheet name key <$> new_bars
-  where new_bars = substitute $ Keyed key bars :: Gen [Bar]
--}
+generate_substitutions (Sheet name key bars) = Sheet name key <$> substitute (Keyed key bars)
+  where
+    substitute_list :: (Traversable t) => Keyed (t Chord) -> IO (t Chord)
+    substitute_list (Keyed k trav) = mapM (substitute . Keyed k) trav
+
+class Substitutable s where
+  substitute :: Keyed s -> IO s
+
+instance Substitutable Chord where
+  substitute chord = generate $ generator (mconcat subs) chord
+    where subs =[no_sub, tritone_sub, sharp_i_replaces_VI]
+
+instance (Traversable t, Substitutable s) => Substitutable (t s) where
+  substitute (Keyed k trav) = mapM (substitute . Keyed k) trav
+
 {-
-  A substitution is a datastructure describing a possible chord substitution. If a chord satisfies a condition, return Just a generator for that chord, else return Nothing.
-
-  A generator has the option
-
-  A list of substitions is a substitution itself
-
-  if
+  A substitution is a datastructure describing a possible chord substitution.
 -}
-{-|
-  A substitution is a way of turning a `Keyed c` into a variant of a c, where c is chord-like.
-
-|-}
-class Substitution s c where
+data Substitution = Substitution {
   -- | The name of the substitution.
-  sub_name :: s -> String
+  sub_name       :: String,
 
   -- | Returns True if is situationally appropriate for this chord, else False.
-  is_situational :: s -> Keyed c -> Bool
+  is_situational :: Predicate (Keyed Chord),
 
   -- | It may be that there are many substitutions that are appropriate for a given chord. If this is the case, then we need a way knowing how often to use each substitution.
-  freq :: s -> Int
+  freq           :: Int,
 
   -- |
-  generator  :: s -> Keyed c -> Gen c
+  generator      :: Keyed Chord -> Gen Chord }
 
-  -- |
-  substitute :: s -> Keyed Chord -> IO Chord
+instance Monoid Substitution where
+  mempty = undefined
 
-instance (Substitution s c, MonadPlus m, Foldable m) => Substitution s (m c) where
-  sub_name mp = intersperse ", " names
-    where names = sub_name <$> toList mp
+  mappend s1 s2 = mconcat [s1, s2]
 
-  is_situational mp chord = or . fmap (flip is_situational chord) mp
-
-  freq = sum . fmap freq
-
-  generator mp chord = frequency $ fmap (flip gen_tuple chord) (situationals mp chord)
+  mconcat list = Substitution name pred d gen
     where
-      gen_tuple :: s -> Keyed c -> (Int, Gen c)
-      gen_tuple s c = (freq s, generator s c)
+      name = intercalate ", " $ fmap sub_name list
+      pred = or $ fmap is_situational list
+      d    = sum $ fmap freq list
+      gen  = \chord -> frequency $ mapMaybe (gen_tuples chord) list
 
-  --
-  substitute mp chord = undefined
+      gen_tuples :: Keyed Chord -> Substitution -> Maybe (Int, Gen Chord)
+      gen_tuples chord (Substitution _ p d g) =
+        if getPredicate p chord
+          then Just (d, g chord)
+          else Nothing
 
-situationals :: s -> Keyed c -> m c
-situationals s c = mfilter (flip is_situational c) s
+basic_substitution :: String
+                      -> Predicate (Keyed Chord)
+                      -> Int
+                      -> (Keyed Chord -> Gen Chord)
+                      -> Substitution
+basic_substitution = Substitution
 
-data BasicSub a = BasicSub { basic_sub_name  :: String,
-                             basic_freq      :: Int,
-                             predicate       :: ChordPredicate (Keyed a),
-                             basic_generator :: Keyed a -> Gen a }
+interpreted_substitution :: (ChordLike c)
+                            => String
+                            -> Predicate (Keyed InterpretedChord)
+                            -> Int
+                            -> (Keyed InterpretedChord -> Gen c)
+                            -> Substitution
+interpreted_substitution name pred d g = Substitution name new_pred d gen
+  where gen chord@(Keyed k _) = fmap (as_chord . Keyed k) . g . extend convert_to $ chord
 
-instance Substitution (BasicSub c) c where
-  sub_name = basic_sub_name
-  is_situational chord = (getPredicate predicate chord) && (can_convert_to chord)
-  freq = basic_freq
-  generator s chord = basic_generator
-  substitute s chord = generate $ generator s chord
+        new_pred = is_interpreted && contramap (extend convert_to) pred :: Predicate (Keyed Chord)
+
+        convert_to :: Keyed Chord -> InterpretedChord
+        convert_to (Keyed k (Chord root qual exts)) =
+          fromJust $ (\deg -> InterpretedChord deg qual exts) <$> scale_degree k root
 
 
 -- Substitutions
-no_sub :: BasicSub Chord
-no_sub = BasicSub "No Sub" 40 (Just . pure . unkeyed)
+no_sub :: Substitution
+no_sub = basic_substitution "No Sub" (ChordPredicate.true) 40 (pure . extract)
 
-tritone_sub :: BasicSub Chord
-tritone_sub = BasicSub "Tritone" 20 (Just . tritone)
-  where tritone (Keyed _ (Chord root _ _)) = pure $ Chord (fst . pitch $ pcToInt root + 6) Dom [Add 7]
+tritone_sub :: Substitution
+tritone_sub = basic_substitution "Tritone" (ChordPredicate.true) 20 (pure . tritone)
+  where tritone (Keyed _ (Chord root _ _)) = Chord (fst . pitch $ pcToInt root + 6) Dom [Add 7]
+
+sharp_i_replaces_VI :: Substitution
+sharp_i_replaces_VI = interpreted_substitution
+                        "#i dim replaces vi"
+                        (has_degree IV)
+                        100
+                        gen
+  where
+    gen :: Keyed InterpretedChord -> Gen Chord
+    gen (Keyed k (InterpretedChord _ qual exts)) =
+      pure . transpose_chord 1 . as_chord . Keyed k $ InterpretedChord I Dim [Add 7]
+
+
 
 --Extra instances for Primitive
 instance Foldable Primitive where
@@ -102,3 +128,5 @@ instance Foldable Primitive where
 instance Traversable Primitive where
   traverse f (Note d x) = Note d <$> f x
   traverse f (Rest d)   = pure $ Rest d
+
+

@@ -17,6 +17,7 @@ import           Euterpea.Music
 import           Test.QuickCheck
 import           Test.QuickCheck.Gen
 
+{-
 class AddPassing p where
   passing_chords :: Keyed p -> Gen p
 
@@ -55,3 +56,4 @@ no_addition = PassingAddition "No Addition" 40 (Predicate $ const True) (\_ c _ 
 tritone_addition :: PassingAddition
 tritone_addition = PassingAddition "Tritone Addition" 20 (Predicate $ const True) f
   where f _ (Chord root _ _) _ = pure $ Chord (fst . pitch $ pcToInt root + 6) Dom [Add 7]
+-}

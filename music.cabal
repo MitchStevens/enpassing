@@ -22,6 +22,7 @@ executable music
                        contravariant,
                        comonad,
                        containers,
+                       cond,
                        deepseq,
                        Euterpea,
                        QuickCheck,
