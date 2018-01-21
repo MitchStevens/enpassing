@@ -1,12 +1,13 @@
 module Enpassing.Music.Interval where
 
-import Data.Monoid
-import Euterpea
+import           Data.Monoid
+import           Euterpea
 --import Enpassing.Music
+import           Test.QuickCheck
 
 data Interval = Unison   | Minor2nd   | Major2nd | Minor3rd
               | Major3rd | Perfect4th | Tritone  | Perfect5th
-              | Minor6th | Major6th   | Minor7th | Major7th deriving (Eq, Show, Enum)
+              | Minor6th | Major6th   | Minor7th | Major7th deriving (Eq, Show, Enum, Bounded)
 
 to_interval :: Int -> Interval
 to_interval = toEnum . (`mod`12)
@@ -17,3 +18,9 @@ adj_pitchclass p interval = fst . pitch $ (fromEnum interval) + (pcToInt p)
 instance Monoid Interval where
   mempty = Unison
   mappend in1 in2 = to_interval $ fromEnum in1 + fromEnum in2
+
+instance Arbitrary Interval where
+  arbitrary = arbitraryBoundedEnum
+
+  shrink Unison = []
+  shrink x      = [Unison]

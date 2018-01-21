@@ -9,12 +9,6 @@ import           Enpassing.Music
 import           Euterpea.Music
 import           Prelude                       hiding (not, (&&), (||))
 
-true :: Predicate (Keyed Chord)
-true = Predicate $ const True
-
-false :: Predicate (Keyed Chord)
-false = Predicate $ const False
-
 has_root :: PitchClass -> Predicate (Keyed Chord)
 has_root p1 = Predicate $ \(Keyed _ (Chord p2 _ _)) -> p1 == p2
 

@@ -1,6 +1,5 @@
 module Enpassing.Music.Scale (
   scale_ext,
-  subscale,
   scale_degree,
   scale_notes,
   ScaleDegree (..)
@@ -17,29 +16,32 @@ data ScaleDegree = I | II | III | IV | V | VI | VII deriving (Eq, Show, Enum)
 major_intervals = [w, w, h, w, w, w, h]
   where (h, w) = (1, 2)
 
-scale_ext :: Pitch -> Mode -> Extension -> Pitch
-scale_ext root mode ext = pitch $ (inf_scale (mk_scale mode) !! (degree ext - 1)) + accedental + absPitch root
+{- Given a root note and a Keyed Extension, return whatever note is the root + the extension
+  Examples:
+    scale_ext (C, 0) (Keyed (C, Major) (Add 7)) = (B, 0)
+    scale_ext (C, 0) (Keyed (G, Mox..) (Add 7)) = (B, 0)
+    scale_ext (C, 0) (Keyed (C, Mix..) (Add 7)) = (Bb, 0)
+    scale_ext (G, 1) (Keyed (G))
+-}
+scale_ext :: Pitch -> Keyed Extension -> Pitch
+scale_ext root (Keyed k ext) = pitch $ (cycle_scale scale !! (degree ext - 1)) + accedental
   where
     accedental = case ext of
       Sharp _ -> 1
       Add   _ -> 0
       Flat  _ -> -1
 
-scale_degree :: Key -> PitchClass -> Maybe ScaleDegree
-scale_degree key note = toEnum. fromEnum <$> elemIndex note (scale_notes key)
+{-  -}
+scale_degree :: Key -> Maybe ScaleDegree
+scale_degree (root, mode) = toEnum . fromEnum <$> elemIndex note (scale_notes key)
 
-scale_notes :: Key -> [PitchClass]
-scale_notes (root, mode) = fst . pitch . (r+) <$> mk_scale mode
-  where r = fromEnum root
+{- Given a scale, return an infinite list of the notes in octave 1, then in octave 2, etc -}
+cycle_scale :: Key -> Scale
+cycle_scale key = concatMap (\x -> fmap (+x) (mk_scale key)) [0, 12..]
 
-subscale :: Pitch -> Mode -> Int -> [Pitch]
-subscale root mode n = take n . map (pitch . (+ absPitch root)) $ mk_scale mode
-
-inf_scale :: Scale -> Scale
-inf_scale pitches = [0, 12..] >>= (\x -> (+x) <$> take 7 pitches)
-
-mk_scale :: Mode -> Scale
-mk_scale mode = case mode of
+{- Given a mode, return a scale with root starting at at the root note -}
+mk_scale :: Key -> Scale
+mk_scale (root, mode) = fmap (root+) $ case mode of
   Major                  -> shift_scale 0
   Minor                  -> shift_scale 5
   Ionian                 -> shift_scale 0

@@ -5,6 +5,7 @@ module Enpassing.Music.Extension where
 
 import           Control.DeepSeq
 import           GHC.Generics    (Generic)
+import           Test.QuickCheck
 
 {- An Extension is an extra note that can be added to a chord, to provide more colour or tension. If the note is all  -}
 data Extension = Sharp Int | Flat Int | Add Int -- | No a | Sus a
@@ -19,3 +20,13 @@ degree :: Extension -> Int
 degree (Sharp n) = n
 degree (Flat n)  = n
 degree (Add n)   = n
+
+
+instance Arbitrary Extension where
+  arbitrary = do
+    n    <- elements [6, 7, 9, 11, 13]
+    qual <- elements [Sharp, Flat, Add]
+    return $ qual n
+
+  shrink (Add 7) = []
+  shrink _       = [Add 7]

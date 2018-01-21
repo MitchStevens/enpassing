@@ -37,7 +37,7 @@ class Substitutable s where
 
 instance Substitutable Chord where
   substitute chord = generate $ generator (mconcat subs) chord
-    where subs =[no_sub, tritone_sub, sharp_i_replaces_VI]
+    where subs =[no_sub, sharp_i_replaces_VI]
 
 instance (Traversable t, Substitutable s) => Substitutable (t s) where
   substitute (Keyed k trav) = mapM (substitute . Keyed k) trav
@@ -90,21 +90,17 @@ interpreted_substitution :: (ChordLike c)
                             -> (Keyed InterpretedChord -> Gen c)
                             -> Substitution
 interpreted_substitution name pred d g = Substitution name new_pred d gen
-  where gen chord@(Keyed k _) = fmap (as_chord . Keyed k) . g . extend convert_to $ chord
-
-        new_pred = is_interpreted && contramap (extend convert_to) pred :: Predicate (Keyed Chord)
-
-        convert_to :: Keyed Chord -> InterpretedChord
-        convert_to (Keyed k (Chord root qual exts)) =
-          fromJust $ (\deg -> InterpretedChord deg qual exts) <$> scale_degree k root
+  where
+    gen chord@(Keyed k _) = fmap (as_chord . Keyed k) . g . extend convert_to $ chord
+    new_pred = is_interpreted && contramap (extend convert_to) pred
 
 
 -- Substitutions
 no_sub :: Substitution
-no_sub = basic_substitution "No Sub" (ChordPredicate.true) 40 (pure . extract)
+no_sub = basic_substitution "No Sub" true 1 (pure . extract)
 
 tritone_sub :: Substitution
-tritone_sub = basic_substitution "Tritone" (ChordPredicate.true) 20 (pure . tritone)
+tritone_sub = basic_substitution "Tritone" true 5 (pure . tritone)
   where tritone (Keyed _ (Chord root _ _)) = Chord (fst . pitch $ pcToInt root + 6) Dom [Add 7]
 
 sharp_i_replaces_VI :: Substitution
@@ -115,9 +111,8 @@ sharp_i_replaces_VI = interpreted_substitution
                         gen
   where
     gen :: Keyed InterpretedChord -> Gen Chord
-    gen (Keyed k (InterpretedChord _ qual exts)) =
+    gen (Keyed k (InterpretedChord _ _ _)) =
       pure . transpose_chord 1 . as_chord . Keyed k $ InterpretedChord I Dim [Add 7]
-
 
 
 --Extra instances for Primitive

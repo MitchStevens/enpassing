@@ -11,6 +11,7 @@ module Enpassing.Music.Chord (
 
 import           Control.DeepSeq
 import           Control.Monad
+import           Data.Function             (on)
 import           Data.List                 (delete, nubBy, null, (\\))
 import           Enpassing.Music.Extension
 import           Enpassing.Music.Interval
@@ -32,7 +33,7 @@ import           Test.QuickCheck.Gen
     The quality of a half diminished chord (say, Bm7b5) would be represented as Chord B Min [Add 7, Flat 5], there is no special quality to represent it.
 |-}
 data Quality = Maj | Min | Dom | Aug | Dim
-  deriving (Eq, Generic, NFData)
+  deriving (Eq, Generic, NFData, Bounded)
 
 data Chord = Chord PitchClass Quality [Extension]
   deriving (Generic, NFData)
@@ -124,3 +125,21 @@ implicit_extensions ext      = [ext]
 
 transpose_chord :: Int -> Chord -> Chord
 transpose_chord n (Chord root qual exts) = Chord (fst . pitch . (+1) . pcToInt $ root) qual exts
+
+
+--Generators for chords
+instance Arbitrary Quality where
+  arbitrary = arbitraryBoundedEnum
+
+  shrink Major = []
+  shrink x     = [Major]
+
+instance Arbitrary Chord where
+  arbitrary = do
+    root <- arbitrary
+    qual <- arbitrary
+    exts <- do
+      n <- choose (0, 7)
+      e <- vectorOf len
+      return $ nubBy ((==) `on` degree) e
+    return $ Chord root qual exts

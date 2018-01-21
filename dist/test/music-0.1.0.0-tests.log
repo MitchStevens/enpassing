@@ -68,6 +68,14 @@ Test suite tests: RUNNING...
         Testing that the scale [(C,4),(D,4),(Ds,4),(F,4),(G,4),(Gs,4),(As,4)] can be produced from((C,4),Minor):    OK
         Testing that the scale [(A,4),(B,4),(C,5),(D,5),(E,5),(F,5),(G,5)] can be produced from((A,4),Minor):       OK
         Testing that the scale [(F,4),(G,4),(Gs,4),(As,4),(C,5),(Cs,5),(Ds,5)] can be produced from((F,4),Minor):   OK
+      Degree Tests
+        :                                                                                                           OK
+        :                                                                                                           FAIL
+          test\TestScale.hs:45:
+          fail
+    Conversion
+      Interpreted Test:                                                                                             FAIL
+        Exception: Maybe.fromJust: Nothing
   IO Tests
     Song: "Fly me to the Moon"
       Has the correct number of bars:                                                                               OK
@@ -89,6 +97,6 @@ Test suite tests: RUNNING...
         Bar 14 ([Note (1 % 1) Cmaj7]) should have duration 1:                                                       OK
         Bar 15 ([Note (1 % 2) Bm(b5),Note (1 % 2) E(b9)]) should have duration 1:                                   OK
 
-All 73 tests passed (0.01s)
-Test suite tests: PASS
+2 out of 76 tests failed (0.01s)
+Test suite tests: FAIL
 Test suite logged to: dist\test\music-0.1.0.0-tests.log
