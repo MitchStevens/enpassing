@@ -21,11 +21,11 @@ play :: Playable p => p -> IO ()
 play = MIDI.play . as_music
 
 play_click :: Playable p => p -> IO ()
-play_click playable = MIDI.play $ (toMusic1 click_track) /=: (toMusic1 $ as_music playable)
+play_click playable = MIDI.play $ toMusic1 click_track /=: toMusic1 $ as_music playable
   where click_track = forever $ perc AcousticSnare    qn
 
 play_drum :: Playable p => p -> IO ()
-play_drum playable = MIDI.play . controls$ (toMusic1 drum_track) /=: (toMusic1 $ as_music playable)
+play_drum playable = MIDI.play . controls $ toMusic1 drum_track /=: toMusic1 $ as_music playable
   where drum_track = let bass  = perc AcousticBassDrum qn
                          snare = perc AcousticSnare    qn
                          hihat = perc ClosedHiHat      qn

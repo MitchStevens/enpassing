@@ -22,15 +22,15 @@
   (major1) == 4 && (major2) == 10 && (minor) <= 1)
 #endif /* MIN_VERSION_base */
 
-/* package contravariant-1.4 */
+/* package contravariant-1.4.1 */
 #ifndef VERSION_contravariant
-#define VERSION_contravariant "1.4"
+#define VERSION_contravariant "1.4.1"
 #endif /* VERSION_contravariant */
 #ifndef MIN_VERSION_contravariant
 #define MIN_VERSION_contravariant(major1,major2,minor) (\
   (major1) <  1 || \
   (major1) == 1 && (major2) <  4 || \
-  (major1) == 1 && (major2) == 4 && (minor) <= 0)
+  (major1) == 1 && (major2) == 4 && (minor) <= 1)
 #endif /* MIN_VERSION_contravariant */
 
 /* package comonad-5.0.2 */
@@ -43,6 +43,17 @@
   (major1) == 5 && (major2) <  0 || \
   (major1) == 5 && (major2) == 0 && (minor) <= 2)
 #endif /* MIN_VERSION_comonad */
+
+/* package cond-0.4.1.1 */
+#ifndef VERSION_cond
+#define VERSION_cond "0.4.1.1"
+#endif /* VERSION_cond */
+#ifndef MIN_VERSION_cond
+#define MIN_VERSION_cond(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  4 || \
+  (major1) == 0 && (major2) == 4 && (minor) <= 1)
+#endif /* MIN_VERSION_cond */
 
 /* package containers-0.5.10.2 */
 #ifndef VERSION_containers
@@ -77,6 +88,17 @@
   (major1) == 2 && (major2) == 0 && (minor) <= 4)
 #endif /* MIN_VERSION_Euterpea */
 
+/* package HUnit-1.6.0.0 */
+#ifndef VERSION_HUnit
+#define VERSION_HUnit "1.6.0.0"
+#endif /* VERSION_HUnit */
+#ifndef MIN_VERSION_HUnit
+#define MIN_VERSION_HUnit(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  6 || \
+  (major1) == 1 && (major2) == 6 && (minor) <= 0)
+#endif /* MIN_VERSION_HUnit */
+
 /* package QuickCheck-2.10.1 */
 #ifndef VERSION_QuickCheck
 #define VERSION_QuickCheck "2.10.1"
@@ -87,17 +109,6 @@
   (major1) == 2 && (major2) <  10 || \
   (major1) == 2 && (major2) == 10 && (minor) <= 1)
 #endif /* MIN_VERSION_QuickCheck */
-
-/* package QuickCheck-GenT-0.2.0 */
-#ifndef VERSION_QuickCheck_GenT
-#define VERSION_QuickCheck_GenT "0.2.0"
-#endif /* VERSION_QuickCheck_GenT */
-#ifndef MIN_VERSION_QuickCheck_GenT
-#define MIN_VERSION_QuickCheck_GenT(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  2 || \
-  (major1) == 0 && (major2) == 2 && (minor) <= 0)
-#endif /* MIN_VERSION_QuickCheck_GenT */
 
 /* package mtl-2.2.1 */
 #ifndef VERSION_mtl
@@ -132,28 +143,6 @@
   (major1) == 0 && (major2) == 2 && (minor) <= 4)
 #endif /* MIN_VERSION_unliftio */
 
-/* package tasty-1.0.0.1 */
-#ifndef VERSION_tasty
-#define VERSION_tasty "1.0.0.1"
-#endif /* VERSION_tasty */
-#ifndef MIN_VERSION_tasty
-#define MIN_VERSION_tasty(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  0 || \
-  (major1) == 1 && (major2) == 0 && (minor) <= 0)
-#endif /* MIN_VERSION_tasty */
-
-/* package tasty-hunit-0.10.0.1 */
-#ifndef VERSION_tasty_hunit
-#define VERSION_tasty_hunit "0.10.0.1"
-#endif /* VERSION_tasty_hunit */
-#ifndef MIN_VERSION_tasty_hunit
-#define MIN_VERSION_tasty_hunit(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  10 || \
-  (major1) == 0 && (major2) == 10 && (minor) <= 0)
-#endif /* MIN_VERSION_tasty_hunit */
-
 /* package text-1.2.2.2 */
 #ifndef VERSION_text
 #define VERSION_text "1.2.2.2"
@@ -187,15 +176,26 @@
   (major1) == 3 && (major2) == 2 && (minor) <= 3)
 #endif /* MIN_TOOL_VERSION_alex */
 
-/* tool gcc-6.2.0 */
+/* tool cpphs-1.20.8 */
+#ifndef TOOL_VERSION_cpphs
+#define TOOL_VERSION_cpphs "1.20.8"
+#endif /* TOOL_VERSION_cpphs */
+#ifndef MIN_TOOL_VERSION_cpphs
+#define MIN_TOOL_VERSION_cpphs(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  20 || \
+  (major1) == 1 && (major2) == 20 && (minor) <= 8)
+#endif /* MIN_TOOL_VERSION_cpphs */
+
+/* tool gcc-5.4.0 */
 #ifndef TOOL_VERSION_gcc
-#define TOOL_VERSION_gcc "6.2.0"
+#define TOOL_VERSION_gcc "5.4.0"
 #endif /* TOOL_VERSION_gcc */
 #ifndef MIN_TOOL_VERSION_gcc
 #define MIN_TOOL_VERSION_gcc(major1,major2,minor) (\
-  (major1) <  6 || \
-  (major1) == 6 && (major2) <  2 || \
-  (major1) == 6 && (major2) == 2 && (minor) <= 0)
+  (major1) <  5 || \
+  (major1) == 5 && (major2) <  4 || \
+  (major1) == 5 && (major2) == 4 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_gcc */
 
 /* tool ghc-8.2.2 */
@@ -219,6 +219,28 @@
   (major1) == 8 && (major2) <  2 || \
   (major1) == 8 && (major2) == 2 && (minor) <= 2)
 #endif /* MIN_TOOL_VERSION_ghc_pkg */
+
+/* tool ghcjs-0.2.0 */
+#ifndef TOOL_VERSION_ghcjs
+#define TOOL_VERSION_ghcjs "0.2.0"
+#endif /* TOOL_VERSION_ghcjs */
+#ifndef MIN_TOOL_VERSION_ghcjs
+#define MIN_TOOL_VERSION_ghcjs(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  2 || \
+  (major1) == 0 && (major2) == 2 && (minor) <= 0)
+#endif /* MIN_TOOL_VERSION_ghcjs */
+
+/* tool ghcjs-pkg-7.10.3 */
+#ifndef TOOL_VERSION_ghcjs_pkg
+#define TOOL_VERSION_ghcjs_pkg "7.10.3"
+#endif /* TOOL_VERSION_ghcjs_pkg */
+#ifndef MIN_TOOL_VERSION_ghcjs_pkg
+#define MIN_TOOL_VERSION_ghcjs_pkg(major1,major2,minor) (\
+  (major1) <  7 || \
+  (major1) == 7 && (major2) <  10 || \
+  (major1) == 7 && (major2) == 10 && (minor) <= 3)
+#endif /* MIN_TOOL_VERSION_ghcjs_pkg */
 
 /* tool haddock-2.18.1 */
 #ifndef TOOL_VERSION_haddock
@@ -275,6 +297,17 @@
   (major1) == 1 && (major2) == 24 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_hscolour */
 
+/* tool pkg-config-0.29.1 */
+#ifndef TOOL_VERSION_pkg_config
+#define TOOL_VERSION_pkg_config "0.29.1"
+#endif /* TOOL_VERSION_pkg_config */
+#ifndef MIN_TOOL_VERSION_pkg_config
+#define MIN_TOOL_VERSION_pkg_config(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  29 || \
+  (major1) == 0 && (major2) == 29 && (minor) <= 1)
+#endif /* MIN_TOOL_VERSION_pkg_config */
+
 /* tool runghc-8.2.2 */
 #ifndef TOOL_VERSION_runghc
 #define TOOL_VERSION_runghc "8.2.2"
@@ -286,15 +319,15 @@
   (major1) == 8 && (major2) == 2 && (minor) <= 2)
 #endif /* MIN_TOOL_VERSION_runghc */
 
-/* tool strip-2.27 */
+/* tool strip-2.26 */
 #ifndef TOOL_VERSION_strip
-#define TOOL_VERSION_strip "2.27"
+#define TOOL_VERSION_strip "2.26"
 #endif /* TOOL_VERSION_strip */
 #ifndef MIN_TOOL_VERSION_strip
 #define MIN_TOOL_VERSION_strip(major1,major2,minor) (\
   (major1) <  2 || \
-  (major1) == 2 && (major2) <  27 || \
-  (major1) == 2 && (major2) == 27 && (minor) <= 0)
+  (major1) == 2 && (major2) <  26 || \
+  (major1) == 2 && (major2) == 26 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_COMPONENT_ID

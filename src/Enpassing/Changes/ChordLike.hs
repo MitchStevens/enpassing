@@ -16,5 +16,7 @@ instance ChordLike Chord where
   as_chord = extract
 
 instance ChordLike InterpretedChord where
- as_chord (Keyed k (InterpretedChord deg qual exts)) =
-  Chord (scale_notes k !! fromEnum deg) qual exts
+ as_chord (Keyed k (InterpretedChord root qual exts)) =
+  Chord (degree_as_pitch (Keyed k root)) qual exts
+
+  --mk_scale :: (Pitch, Mode) -> Scale

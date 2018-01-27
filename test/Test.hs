@@ -1,17 +1,31 @@
 import           Control.Monad
-import           Test.Tasty
-import           TestChord
-import           TestInterpreted
+import           Data.Proxy
+import           System.Environment
+import qualified TestChord
+--import           TestInterpreted
+import qualified PropInterpreted
+import qualified PropScale
+import qualified TestInterpreted
 import           TestParsers
 import           TestScale
-import           TestSheet
+import qualified TestSheet
 
-main = all_tests >>= defaultMain
-  where all_tests = (\tree -> testGroup "" [non_io_tests, tree]) <$> io_tests
+main = do
+  TestChord.main
+  TestInterpreted.main
 
-non_io_tests :: TestTree
-non_io_tests = testGroup "Non IO Tests" [
-  TestParsers.tests, TestChord.tests, TestScale.tests, TestInterpreted.tests]
+  PropInterpreted.main
+  PropScale.main
 
-io_tests :: IO TestTree
-io_tests = testGroup "IO Tests" <$> sequence [TestSheet.tests]
+  {-
+non_io_tests :: [TestTree]
+non_io_tests = [
+  TestParsers.tests,
+  TestChord.tests,
+  TestScale.tests,
+  TestInterpreted.tests]
+
+io_tests :: IO [TestTree]
+io_tests = sequence [
+  TestSheet.tests]
+-}

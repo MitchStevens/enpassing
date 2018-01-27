@@ -22,7 +22,7 @@ main :: IO ()
 main = with_subs
   where
     no_subs   = io_sheet >>= print
-    with_subs = io_sheet >>= generate_substitutions >>= print --print_and_play
+    with_subs = io_sheet >>= generate_substitutions >>= print
     --with_additions = io_sheet >>= generate_passing_chords >>= print_and_play
 
 print_and_play sheet = print sheet >> play_drum sheet
