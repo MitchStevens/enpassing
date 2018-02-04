@@ -1,6 +1,12 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Enpassing.Changes.Passing where
+module Enpassing.Changes.Passing (
+  Passing,
+  passing,
+
+  no_addition,
+  tritone_addition
+) where
 
 import           Control.Comonad
 import           Data.Algebra.Boolean
@@ -13,38 +19,35 @@ import           Enpassing.Instances
 import           Enpassing.Music
 import           Euterpea.Music
 import           Test.QuickCheck
+import Enpassing.Changes.ChordModification
 import           Test.QuickCheck.Gen
+import Data.Ratio
 
-{-
-generate_passing_chords :: Sheet -> IO Sheet
-generate_passing_chords (Sheet name key bars) = generate $ Sheet name key <$> new_bars
-  where new_bars = fmap as_bars . passing_chords $ Keyed key (concat bars)
--}
-data PassingChord = PassingChord {
-  pass_name         :: String,
-  pass_situtational :: Key -> Primitive Chord -> Chord -> Bool,
-  pass_generator    :: Key -> Primitive Chord -> Chord -> Gen [Primitive Chord] }
+data Passing = Passing
+  { pas_name :: String
+  , pas_pred :: Keyed Chord -> Bool
+  , pas_gen  :: Keyed Chord -> Chord
+  }
 
-basic_passing_chord :: String
-                    -> (Key -> Chord -> Chord -> Bool)
-                    -> (Key -> Chord -> Chord -> Maybe Chord)
-                    -> PassingChord
-basic_passing_chord name pred gen = PassingChord name p2 g2
-  where
-    p2 key prim c2 = case prim of
-      Note d c1 -> pred key c1 c2
-      Rest d    -> False
+instance Modification Passing where
+  name = pas_name
+  situational m (Keyed k prim) = case prim of
+    Note d x -> if d >= (1%4) then pas_pred m (Keyed k x) else False
+    Rest _   -> False
+  generator m (Keyed k prim) = case prim of
+    Note d c1 -> pure [Note (d/2) c1, Note (d/2) c2]
+      where c2 = pas_gen m (Keyed k c2)
+    Rest _    -> error "Can't add a passing chord to a rest"
 
-    g2 key prim c2 = pure $ fromMaybe [prim] new_passing
-      where
-        new_passing = do
-          Note d c1 <- get_note prim
-          passing <- gen key c1 c2
-          return [Note (d/2) c1, Note (d/2) passing]
+passing :: String
+        -> (Keyed Chord -> Bool)
+        -> (Keyed Chord -> Chord)
+        -> Passing
+passing = Passing
 
-no_addition :: PassingChord
-no_addition = basic_passing_chord "No Addition" true (\_ _ _ -> Nothing)
+no_addition :: Passing
+no_addition = Passing "No Addition" true extract
 
-tritone_addition :: PassingChord
-tritone_addition = basic_passing_chord "Tritone Addition" true gen
-  where gen _ (Chord root _ _) _ = Just . transpose_chord 6 $ Chord root Mixolydian [Add 7]
+tritone_addition :: Passing
+tritone_addition = Passing "Tritone Addition" true gen
+  where gen (Keyed k (Chord root _ _)) = transpose_chord 6 $ Chord root Mixolydian [Add 7]

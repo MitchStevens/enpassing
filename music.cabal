@@ -34,20 +34,22 @@ executable music
   hs-source-dirs:      src
   default-language:    Haskell2010
   other-modules:       Enpassing.Changes.ChordLike
-                       Enpassing.Changes.JazzChange
                        Enpassing.Changes.Predicate
                        Enpassing.Changes.Interpreted
                        Enpassing.Changes.Passing
                        Enpassing.Changes.Substitution
-                       Enpassing.Music
+                       Enpassing.Changes.ChordModification
+                       Enpassing.Changes.Style
                        Enpassing.Music.Chord
                        Enpassing.Music.Extension
                        Enpassing.Music.Interval
                        Enpassing.Music.Key
                        Enpassing.Music.Scale
                        Enpassing.Music.Sheet
+                       Enpassing.Music
                        Enpassing.Playable
-                       Instances
+                       Enpassing.Instances
+                       Enpassing.Changes
                        Parsers
 
 test-suite tests

@@ -21,7 +21,6 @@ instance (Boolean b) => Boolean (a -> b) where
   (f && g) x = f x && g x
 
 
-
 -- Substution Predicates
 
 {-| check the  |-}

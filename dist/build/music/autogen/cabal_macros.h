@@ -22,15 +22,15 @@
   (major1) == 4 && (major2) == 10 && (minor) <= 1)
 #endif /* MIN_VERSION_base */
 
-/* package contravariant-1.4.1 */
+/* package contravariant-1.4 */
 #ifndef VERSION_contravariant
-#define VERSION_contravariant "1.4.1"
+#define VERSION_contravariant "1.4"
 #endif /* VERSION_contravariant */
 #ifndef MIN_VERSION_contravariant
 #define MIN_VERSION_contravariant(major1,major2,minor) (\
   (major1) <  1 || \
   (major1) == 1 && (major2) <  4 || \
-  (major1) == 1 && (major2) == 4 && (minor) <= 1)
+  (major1) == 1 && (major2) == 4 && (minor) <= 0)
 #endif /* MIN_VERSION_contravariant */
 
 /* package comonad-5.0.2 */
@@ -165,26 +165,15 @@
   (major1) == 3 && (major2) == 2 && (minor) <= 3)
 #endif /* MIN_TOOL_VERSION_alex */
 
-/* tool cpphs-1.20.8 */
-#ifndef TOOL_VERSION_cpphs
-#define TOOL_VERSION_cpphs "1.20.8"
-#endif /* TOOL_VERSION_cpphs */
-#ifndef MIN_TOOL_VERSION_cpphs
-#define MIN_TOOL_VERSION_cpphs(major1,major2,minor) (\
-  (major1) <  1 || \
-  (major1) == 1 && (major2) <  20 || \
-  (major1) == 1 && (major2) == 20 && (minor) <= 8)
-#endif /* MIN_TOOL_VERSION_cpphs */
-
-/* tool gcc-5.4.0 */
+/* tool gcc-6.2.0 */
 #ifndef TOOL_VERSION_gcc
-#define TOOL_VERSION_gcc "5.4.0"
+#define TOOL_VERSION_gcc "6.2.0"
 #endif /* TOOL_VERSION_gcc */
 #ifndef MIN_TOOL_VERSION_gcc
 #define MIN_TOOL_VERSION_gcc(major1,major2,minor) (\
-  (major1) <  5 || \
-  (major1) == 5 && (major2) <  4 || \
-  (major1) == 5 && (major2) == 4 && (minor) <= 0)
+  (major1) <  6 || \
+  (major1) == 6 && (major2) <  2 || \
+  (major1) == 6 && (major2) == 2 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_gcc */
 
 /* tool ghc-8.2.2 */
@@ -208,28 +197,6 @@
   (major1) == 8 && (major2) <  2 || \
   (major1) == 8 && (major2) == 2 && (minor) <= 2)
 #endif /* MIN_TOOL_VERSION_ghc_pkg */
-
-/* tool ghcjs-0.2.0 */
-#ifndef TOOL_VERSION_ghcjs
-#define TOOL_VERSION_ghcjs "0.2.0"
-#endif /* TOOL_VERSION_ghcjs */
-#ifndef MIN_TOOL_VERSION_ghcjs
-#define MIN_TOOL_VERSION_ghcjs(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  2 || \
-  (major1) == 0 && (major2) == 2 && (minor) <= 0)
-#endif /* MIN_TOOL_VERSION_ghcjs */
-
-/* tool ghcjs-pkg-7.10.3 */
-#ifndef TOOL_VERSION_ghcjs_pkg
-#define TOOL_VERSION_ghcjs_pkg "7.10.3"
-#endif /* TOOL_VERSION_ghcjs_pkg */
-#ifndef MIN_TOOL_VERSION_ghcjs_pkg
-#define MIN_TOOL_VERSION_ghcjs_pkg(major1,major2,minor) (\
-  (major1) <  7 || \
-  (major1) == 7 && (major2) <  10 || \
-  (major1) == 7 && (major2) == 10 && (minor) <= 3)
-#endif /* MIN_TOOL_VERSION_ghcjs_pkg */
 
 /* tool haddock-2.18.1 */
 #ifndef TOOL_VERSION_haddock
@@ -286,17 +253,6 @@
   (major1) == 1 && (major2) == 24 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_hscolour */
 
-/* tool pkg-config-0.29.1 */
-#ifndef TOOL_VERSION_pkg_config
-#define TOOL_VERSION_pkg_config "0.29.1"
-#endif /* TOOL_VERSION_pkg_config */
-#ifndef MIN_TOOL_VERSION_pkg_config
-#define MIN_TOOL_VERSION_pkg_config(major1,major2,minor) (\
-  (major1) <  0 || \
-  (major1) == 0 && (major2) <  29 || \
-  (major1) == 0 && (major2) == 29 && (minor) <= 1)
-#endif /* MIN_TOOL_VERSION_pkg_config */
-
 /* tool runghc-8.2.2 */
 #ifndef TOOL_VERSION_runghc
 #define TOOL_VERSION_runghc "8.2.2"
@@ -308,15 +264,15 @@
   (major1) == 8 && (major2) == 2 && (minor) <= 2)
 #endif /* MIN_TOOL_VERSION_runghc */
 
-/* tool strip-2.26 */
+/* tool strip-2.27 */
 #ifndef TOOL_VERSION_strip
-#define TOOL_VERSION_strip "2.26"
+#define TOOL_VERSION_strip "2.27"
 #endif /* TOOL_VERSION_strip */
 #ifndef MIN_TOOL_VERSION_strip
 #define MIN_TOOL_VERSION_strip(major1,major2,minor) (\
   (major1) <  2 || \
-  (major1) == 2 && (major2) <  26 || \
-  (major1) == 2 && (major2) == 26 && (minor) <= 0)
+  (major1) == 2 && (major2) <  27 || \
+  (major1) == 2 && (major2) == 27 && (minor) <= 0)
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_COMPONENT_ID

@@ -14,6 +14,7 @@ import           Data.List                     (intercalate)
 import           Data.Maybe
 import           Data.Monoid
 import           Enpassing.Changes.ChordLike
+import Enpassing.Changes.ChordModification
 import           Enpassing.Changes.Interpreted
 import           Enpassing.Changes.Predicate
 import           Enpassing.Music
@@ -24,30 +25,27 @@ import           Test.QuickCheck
 {-
   A substitution is a datastructure describing a possible chord substitution.
 -}
-data Substitution = Substitution {
-  -- | The name of the substitution.
-  sub_name        :: String,
+data Substitution = Substitution 
+  { sub_name :: String
+  , sub_pred :: Keyed Chord -> Bool
+  , sub_gen  :: Keyed Chord -> Chord
+  }
 
-  -- | Returns True if is situationally appropriate for this chord, else False.
-  sub_situational :: Keyed Chord -> Bool,
-
-  -- |
-  sub_generator   :: Keyed Chord -> Gen Chord }
-
-
-
-basic_substitution :: String
-                   -> (Keyed Chord -> Bool)
-                   -> (Keyed Chord -> Chord)
-                   -> Substitution
-basic_substitution name pred gen = Substitution name pred (pure . gen)
+instance Modification Substitution where
+  name = sub_name
+  situational m (Keyed k prim) = case prim of
+    Note _ x -> sub_pred m (Keyed k x)
+    Rest _   -> False
+  generator m (Keyed k prim) = case prim of
+    Note d x -> pure [Note d (sub_gen m (Keyed k x))]
+    Rest _   -> error "cant substitute into a rest"
 
 interpreted_substitution :: (ChordLike c)
                          => String
                          -> (Keyed InterpretedChord -> Bool)
                          -> (Keyed InterpretedChord -> c)
                          -> Substitution
-interpreted_substitution name pred g = Substitution name new_pred (pure.gen)
+interpreted_substitution name pred g = Substitution name new_pred gen
   where
     gen = as_interpreted =>= g =>= as_chord :: Keyed Chord -> Chord
     new_pred = is_interpreted && (as_interpreted =>= pred)
@@ -56,10 +54,10 @@ interpreted_substitution name pred g = Substitution name new_pred (pure.gen)
 
 -- Substitutions
 no_sub :: Substitution
-no_sub = basic_substitution "No Sub" true extract
+no_sub = Substitution "No Sub" true extract
 
 tritone_sub :: Substitution
-tritone_sub = basic_substitution "Tritone" true tritone
+tritone_sub = Substitution "Tritone" true tritone
   where tritone (Keyed _ (Chord root _ _)) = transpose_chord 6 $ Chord root Mixolydian [Add 7]
 
 sharp_i_replaces_VI :: Substitution
