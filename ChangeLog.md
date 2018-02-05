@@ -16,7 +16,17 @@
   </tr>
   <tr>
     <td>Tritone</td>
-    <td></td>
+    <td>Substitute the dominant 7<sup>th</sup>, transposed up 6 half steps</td>
+    <td>Am7 to D#7</td>
+  </tr>
+  <tr>
+    <td>Simplify</td>
+    <td>Remove extensions and attempt to turn diminished and augmented chords</td>
+    <td>Am9(b13) to Am</td>
+  </tr>
+  <tr>
+    <td>Complexify</td>
+    <td>Add extension, </td>
     <td>Am7 to D#7</td>
   </tr>
 </table>
