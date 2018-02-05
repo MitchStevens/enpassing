@@ -94,5 +94,5 @@ parse_sheet = do
   name <- manyTill anyChar newline
   key  <- string "Key: " *> parse_note <* newline
   bars <- many parse_line
-  return $ Sheet name (key, Major) $ (concat.concat) bars
+  return $ Sheet name (key, Major) $ (init.concat.concat) bars
 

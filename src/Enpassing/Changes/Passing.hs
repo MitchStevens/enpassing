@@ -2,7 +2,7 @@
 
 module Enpassing.Changes.Passing (
   Passing,
-  passing,
+  simple_passing,
 
   no_addition,
   tritone_addition
@@ -26,28 +26,34 @@ import Data.Ratio
 data Passing = Passing
   { pas_name :: String
   , pas_pred :: Keyed Chord -> Bool
-  , pas_gen  :: Keyed Chord -> Chord
+  , pas_gen  :: Keyed Chord -> [Chord]
   }
 
 instance Modification Passing where
   name = pas_name
   situational m (Keyed k prim) = case prim of
-    Note d x -> if d >= (1%4) then pas_pred m (Keyed k x) else False
+    Note d x -> if d < (1%4) then False
+                else pas_pred m (Keyed k x)
     Rest _   -> False
   generator m (Keyed k prim) = case prim of
-    Note d c1 -> pure [Note (d/2) c1, Note (d/2) c2]
-      where c2 = pas_gen m (Keyed k c2)
-    Rest _    -> error "Can't add a passing chord to a rest"
+    Note d c -> pure . fmap note $ list
+      where
+        note = Note (d/n)
+        n = fromInteger . toInteger $ length list :: Rational
+        list = pas_gen m $ Keyed k c :: [Chord]
+    Rest d   -> pure [Rest d]
 
-passing :: String
+simple_passing :: String
         -> (Keyed Chord -> Bool)
         -> (Keyed Chord -> Chord)
         -> Passing
-passing = Passing
+simple_passing name pred gen = Passing name pred new_gen
+  where
+    new_gen chord@(Keyed k c1) = [c1, gen chord]
 
 no_addition :: Passing
-no_addition = Passing "No Addition" true extract
+no_addition = Passing "No Addition" true (pure.extract)
 
 tritone_addition :: Passing
-tritone_addition = Passing "Tritone Addition" true gen
+tritone_addition = simple_passing "Tritone Addition" true gen
   where gen (Keyed k (Chord root _ _)) = transpose_chord 6 $ Chord root Mixolydian [Add 7]

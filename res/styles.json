@@ -1,0 +1,11 @@
+{
+  "styles":[
+    {
+      "name":"boring",
+      "subs":[
+        [1, "no_substition"]
+      ],
+      "adds":[]
+    }
+  ]
+}
