@@ -1,9 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import           Control.Exception
 import           Data.Either
 import           Data.Functor.Compose
 import           Data.Text.IO                   as T
+import qualified Data.Text as T
 import           Enpassing.Changes
 import           Enpassing.Music
 import           Enpassing.Playable
@@ -13,19 +16,13 @@ import           System.IO.Unsafe               (unsafePerformIO)
 import           Test.QuickCheck.Gen
 import           Text.Parsec
 import           UnliftIO.Exception
+import System.Environment
+import Prelude hiding (readFile, putStrLn)
 
-io_sheet :: IO Sheet
-io_sheet = fromEitherM $ parse parse_sheet "" <$> T.readFile "res/over_the_rainbow.txt"
+version = "0.1.0.0" :: String
 
 main :: IO ()
-main = io_sheet >>= stylise basic_style >>= print_and_play
-  where
-    no_subs   = io_sheet >>= print
-    --with_subs = io_sheet >>= generate_substitutions >>= print
-    --with_additions = io_sheet >>= generate_passing_chords >>= print_and_play
-
-print_and_play :: Sheet -> IO ()
-print_and_play sheet = print sheet >> play_drum sheet
+main = getArgs >>= run_cli
 
 instance Exception ParseError where
   toException = SomeException

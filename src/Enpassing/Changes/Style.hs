@@ -1,6 +1,10 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Enpassing.Changes.Style where
+module Enpassing.Changes.Style (
+  Style (..),
+  stylise,
+  styles
+) where
 
 import           Data.Bifunctor
 import           Data.Monoid
@@ -9,6 +13,7 @@ import           Enpassing.Changes.Substitution
 import Enpassing.Changes.ChordModification
 import           Enpassing.Music
 import           Euterpea.Music
+import Data.Map.Strict (Map, fromList)
 import           Test.QuickCheck.Gen
 import Data.Semigroup
 
@@ -33,10 +38,27 @@ instance Semigroup Style where
 stylise :: Style -> Sheet -> IO Sheet
 stylise (Style _ subs adds) sheet = pure sheet >>= modify subs >>= modify adds
 
+styles :: Map String Style
+styles = fromList
+  [ ("None",        none)
+  , ("Basic Jazz",  basic_jazz)
+  , ("Simplify",    simplify)
+  , ("Moody",       moody)]
 
-basic_style = Style "Basic Style"
-  [ --(50, no_sub)
-  --, (20, tritone_sub)
-  (50, sharp_i_replaces_VI) ]
-  [ (40, no_addition)
-  , (20, tritone_addition)]
+none = Style "(You've got) No Style" [] []
+
+basic_jazz = Style "Basic Jazz"
+  [ (100, no_sub)
+  , (100, sub_7th)
+  , (50,  sub_9th)
+  , (10,  sub_11th)
+  , (10,  sub_13th)
+  , (30,  sub_tritone)
+  , (30,  sub_relative)
+  ] []
+
+simplify = Style "Simplify"
+  [(100, sub_simplify)]
+  []
+
+moody = Style "Moody" [] []

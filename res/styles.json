@@ -3,9 +3,19 @@
     {
       "name":"boring",
       "subs":[
-        [1, "no_substition"]
+        [10, "no_substition"]
       ],
       "adds":[]
+    },
+    {
+      "name":"tritone",
+      "subs":[
+        [10, "no_substition"],
+        [2,  "tritone_substitution"]
+      ],
+      "adds":[
+        [5, "trintone"]
+      ]
     }
   ]
 }
