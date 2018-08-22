@@ -1,0 +1,127 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 740c284382912cc59e5914cd7c8ce99b3509ca36c565a4cc36fc2010fe48c535
+
+name:           enpassing
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/MitchStevens/enpassing#readme>
+homepage:       https://github.com/githubuser/enpassing#readme
+bug-reports:    https://github.com/githubuser/enpassing/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2018 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/enpassing
+
+library
+  exposed-modules:
+      Enpassing.Parsers
+      Enpassing.Theory
+      Enpassing.Theory.Accidental
+      Enpassing.Theory.Chord
+      Enpassing.Theory.Class
+      Enpassing.Theory.Degree
+      Enpassing.Theory.Duration
+      Enpassing.Theory.Extension
+      Enpassing.Theory.Key
+      Enpassing.Theory.Mode
+      Enpassing.Theory.Pitch
+      Enpassing.Theory.Scale
+      Enpassing.Theory.Sheet
+      Enpassing.Theory.TimeSignature
+      Enpassing.Theory.Transpose
+      Enpassing.Theory.Types
+      Enpassing.Transition
+      Enpassing.Transition.Change
+      Enpassing.Transition.MusicM
+      Enpassing.Transition.Predicate
+      Enpassing.Transition.Style
+      Enpassing.Transition.Substitution
+  other-modules:
+      Paths_enpassing
+  hs-source-dirs:
+      src
+  default-extensions: LambdaCase TemplateHaskell MultiParamTypeClasses MultiWayIf OverloadedStrings
+  build-depends:
+      HUnit
+    , QuickCheck
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , comonad
+    , containers
+    , lens
+    , midi
+    , mtl
+    , text
+    , transformers
+  default-language: Haskell2010
+
+executable enpassing-exe
+  main-is: Main.hs
+  other-modules:
+      UserInterface
+      Paths_enpassing
+  hs-source-dirs:
+      app
+  default-extensions: LambdaCase TemplateHaskell MultiParamTypeClasses MultiWayIf OverloadedStrings
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O0
+  build-depends:
+      HUnit
+    , QuickCheck
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , comonad
+    , containers
+    , enpassing
+    , lens
+    , midi
+    , mtl
+    , text
+    , transformers
+  default-language: Haskell2010
+
+test-suite enpassing-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Test
+      Test.Comparators
+      Test.Enpassing.Parsers
+      Test.Enpassing.Theory.Chord
+      Test.Enpassing.Theory.Degree
+      Test.Enpassing.Theory.Pitch
+      Test.Generators
+      TestUtils
+      Paths_enpassing
+  hs-source-dirs:
+      test
+  default-extensions: LambdaCase TemplateHaskell MultiParamTypeClasses MultiWayIf OverloadedStrings
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , QuickCheck
+    , aeson
+    , attoparsec
+    , base >=4.7 && <5
+    , comonad
+    , containers
+    , enpassing
+    , lens
+    , midi
+    , mtl
+    , text
+    , transformers
+  default-language: Haskell2010

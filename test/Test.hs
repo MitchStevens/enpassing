@@ -1,3 +1,5 @@
+module Test where
+{-
 import           Control.Monad
 import           Data.Proxy
 import           System.Environment
@@ -17,7 +19,7 @@ main = do
   PropInterpreted.main
   PropScale.main
 
-  {-
+
 non_io_tests :: [TestTree]
 non_io_tests = [
   TestParsers.tests,

@@ -3,41 +3,44 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE UndecidableInstances  #-}
 
-module Enpassing.Changes.Substitution (
+module Enpassing.Transition.Substitution (
   Substitution,
-
+{-
   no_sub,
-  sub_7th, 
-  sub_9th, 
-  sub_11th, 
-  sub_13th, 
-  sub_tritone, 
-  sub_relative, 
-  sub_secondary_dominant, 
-  sub_simplify
+  sub_7th,
+  sub_9th,
+  sub_11th,
+  sub_13th,
+  sub_tritone,
+  sub_relative,
+  sub_secondary_dominant,
+  sub_simplify -}
 ) where
+
+import           Prelude                        hiding (and, not, or, (&&),
+                                                 (||))
+
+import           Enpassing.Theory
+import           Enpassing.Transition.Change
+import           Enpassing.Transition.Predicate
 
 import           Control.Comonad
 import           Control.Monad
-import           Data.Algebra.Boolean
 import           Data.Functor.Compose
-import           Data.Functor.Contravariant
-import           Data.List                     (intercalate)
+--import           Data.Functor.Contravariant
+import           Data.List                      (intercalate)
 import           Data.Maybe
 import           Data.Monoid
-import           Enpassing.Changes.ChordLike
-import Enpassing.Changes.ChordModification
-import           Enpassing.Changes.Interpreted
-import           Enpassing.Changes.Predicate
-import           Enpassing.Music
-import           Euterpea.Music
-import           Prelude                       hiding (and, not, or, (&&), (||))
+
 import           Test.QuickCheck
 
 {-
   A substitution is a datastructure describing a possible chord substitution.
 -}
-data Substitution = Substitution 
+type Substutition = Change Int
+{-
+
+data Substitution = Substitution
   { sub_name :: String
   , sub_pred :: Keyed Chord -> Bool
   , sub_gen  :: Keyed Chord -> Chord
@@ -69,28 +72,28 @@ no_sub = Substitution "No Sub" true extract
 
 sub_7th = interpreted_substitution "Sub 7th" true gen
   where
-    gen (Keyed k (InterpretedChord deg mode exts)) = 
+    gen (Keyed k (InterpretedChord deg mode exts)) =
       if not (elem (Add 7) exts)
         then InterpretedChord deg mode ((Add 7):exts)
         else InterpretedChord deg mode exts
 
 sub_9th = interpreted_substitution "Sub 9th" true gen
   where
-    gen (Keyed k (InterpretedChord deg mode exts)) = 
+    gen (Keyed k (InterpretedChord deg mode exts)) =
       if not (elem (Add 9) exts)
         then InterpretedChord deg mode ((Add 9):exts)
         else InterpretedChord deg mode exts
 
 sub_11th = interpreted_substitution "Sub 11th" true gen
   where
-    gen (Keyed k (InterpretedChord deg mode exts)) = 
+    gen (Keyed k (InterpretedChord deg mode exts)) =
       if not (elem (Add 11) exts)
         then InterpretedChord deg mode ((Add 11):exts)
         else InterpretedChord deg mode exts
 
 sub_13th = interpreted_substitution "Sub 13th" true gen
   where
-    gen (Keyed k (InterpretedChord deg mode exts)) = 
+    gen (Keyed k (InterpretedChord deg mode exts)) =
       if not (elem (Add 7) exts)
         then InterpretedChord deg mode ((Add 13):exts)
         else InterpretedChord deg mode exts
@@ -130,4 +133,5 @@ sharp_i_replaces_VI = interpreted_substitution
     gen :: Keyed InterpretedChord -> Chord
     gen kc@(Keyed k _) = transpose_chord 1 . as_chord $ Keyed k chord
       where chord = Chord (degree_as_pitch (Keyed k I)) (CustomMode "Dim") [Add 7]
+-}
 -}

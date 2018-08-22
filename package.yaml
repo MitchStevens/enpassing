@@ -1,0 +1,67 @@
+name:                enpassing
+version:             0.1.0.0
+github:              "githubuser/enpassing"
+license:             BSD3
+author:              "Author name here"
+maintainer:          "example@example.com"
+copyright:           "2018 Author name here"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/MitchStevens/enpassing#readme>
+
+dependencies:
+  - HUnit
+  - QuickCheck
+  - aeson
+  - attoparsec
+  - base >=4.7 && <5
+  - comonad
+  - lens
+  - mtl
+  - midi
+  - text
+  - transformers
+  - containers
+
+default-extensions:
+- LambdaCase
+- TemplateHaskell
+- MultiParamTypeClasses
+- MultiWayIf
+- OverloadedStrings
+
+library:
+  source-dirs: src
+
+executables:
+  enpassing-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -O0
+    dependencies:
+    - enpassing
+
+tests:
+  enpassing-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - enpassing
