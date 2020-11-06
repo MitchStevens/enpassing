@@ -1,13 +1,0 @@
-Test suite tests: RUNNING...
-Cases: 17  Tried: 0  Errors: 0  Failures: 0Cases: 17  Tried: 1  Errors: 0  Failures: 0Cases: 17  Tried: 2  Errors: 0  Failures: 0Cases: 17  Tried: 3  Errors: 0  Failures: 0Cases: 17  Tried: 4  Errors: 0  Failures: 0Cases: 17  Tried: 5  Errors: 0  Failures: 0Cases: 17  Tried: 6  Errors: 0  Failures: 0Cases: 17  Tried: 7  Errors: 0  Failures: 0Cases: 17  Tried: 8  Errors: 0  Failures: 0Cases: 17  Tried: 9  Errors: 0  Failures: 0Cases: 17  Tried: 10  Errors: 0  Failures: 0Cases: 17  Tried: 11  Errors: 0  Failures: 0Cases: 17  Tried: 12  Errors: 0  Failures: 0Cases: 17  Tried: 13  Errors: 0  Failures: 0Cases: 17  Tried: 14  Errors: 0  Failures: 0Cases: 17  Tried: 15  Errors: 0  Failures: 0Cases: 17  Tried: 16  Errors: 0  Failures: 0                                            Cases: 17  Tried: 17  Errors: 0  Failures: 0
-Cases: 2  Tried: 0  Errors: 0  Failures: 0Cases: 2  Tried: 1  Errors: 0  Failures: 0                                          Cases: 2  Tried: 2  Errors: 0  Failures: 0
-Counts {cases = 2, tried = 2, errors = 0, failures = 0}
-
-PropInterpreted tests
-+++ OK, passed 100 tests.
-
-PropScale tests
-+++ OK, passed 100 tests.
-+++ OK, passed 100 tests.
-Test suite tests: PASS
-Test suite logged to: dist/test/music-0.1.0.0-tests.log

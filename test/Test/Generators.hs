@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Test.Generators where
 
-import           Enpassing.Theory
+import           Music.Theory
 
 import           Control.Lens              (has, over, set, under, (^.),
                                             _Wrapped)
@@ -11,6 +11,106 @@ import           Data.Either
 
 import           Test.QuickCheck.Arbitrary
 import           Test.QuickCheck.Gen
+
+smallInt :: Gen Int
+smallInt = chooseInt (-1000) 1000
+
+instance Arbitrary Accidental where
+  arbitrary = oneof [doubleFlat, flat, natural, sharp, doubleSharp]
+
+
+
+-- Pitch
+instance Gen Pitch where
+  arbitrary = pitchFromSteps <$> chooseInt 0 11
+
+-- Note
+instance Gen Note where
+  arbitrary = noteFromSteps <$> chooseInt 0 47
+
+-- Mode
+instance Gen Mode where
+  arbitrary = Mode <$> genSumList 12
+    where
+      genSumList :: Int -> Gen (Array Int)
+      genSumList n = snd <$> (evalRWST (replicateM_ (n-1) step *> end) unit 1)
+          
+      step :: RWST Unit (Array Int) Int Gen Unit
+      step = do
+        b <- lift arbitrary
+        if b
+          then modify_ (_+1)
+          else do
+            n <- get
+            tell [n]
+            put 1
+
+      end :: RWST Unit (Array Int) Int Gen Unit
+      end = get >>= \n -> tell [n]
+
+-- Scale
+instance Gen r => Gen (Scale r) where
+  arbitrary = mkScale <$> g <*> genMode
+-- Degree
+genDegree :: Gen Degree
+genDegree = Degree <$> genAccidental <*>chooseInt 0 12
+
+
+-- Pitch Class
+genPitchClass :: Gen PitchClass
+genPitchClass = elements (C :| [D, E, F, G, A, B])
+
+-- Pitch
+genPitch :: Gen Pitch
+genPitch = pitchFromSteps <$> chooseInt 0 11
+
+-- Note
+genNote :: Gen Note
+genNote = noteFromSteps <$> chooseInt 0 47
+
+
+-- Mode
+genMode :: Gen Mode
+genMode = Mode <$> genSumList 12
+  where
+    genSumList :: Int -> Gen (Array Int)
+    genSumList n = snd <$> (evalRWST (replicateM_ (n-1) step *> end) unit 1)
+        
+    step :: RWST Unit (Array Int) Int Gen Unit
+    step = do
+      b <- lift arbitrary
+      if b
+        then modify_ (_+1)
+        else do
+          n <- get
+          tell [n]
+          put 1
+
+    end :: RWST Unit (Array Int) Int Gen Unit
+    end = get >>= \n -> tell [n]
+
+-- Scale
+genScale :: forall r. Gen r -> Gen (Scale r)
+genScale g = mkScale <$> g <*> genMode
+
+
+genKey :: Gen Key
+genKey = do
+  b <- arbitrary
+  if b then key <$> genPitch else minorKey <$> genPitch
+
+-- Chord
+genChord :: forall r. Transpose r => Gen r -> Gen (Chord Identity r)
+genChord g = mkChord
+    <$> g
+    <*> genMode
+    <*> (A.nub <<< A.take 7 <$> arrayOf genDegree)
+
+genBasicChord :: Gen BasicChord
+genBasicChord = mkChord
+    <$> genPitch
+    <*> elements ( ionian :| [aeolian] )
+    <*> (A.nub <<< A.take 7 <$> arrayOf genDegree) 
 
 instance Arbitrary Note where
   arbitrary = arbitraryBoundedEnum

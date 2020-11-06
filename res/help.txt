@@ -1,6 +1,0 @@
-usage: [--version] [--help] <command> [<args>]
-
-List of commands:
-  stylise
-
-use '--help <>'

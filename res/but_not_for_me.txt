@@ -1,6 +1,0 @@
-But not for me
-Key: F
-| Fmaj7 | Gm C7 | Fmaj7 | Dm7 |
-| G7    | Gm C7 | Fmaj7 | Cm7 F7 |
-| Bbmaj7 | Bbmin7 Eb7 | Fmaj7 | Fmaj7 |
-| Dm7 | G7 | Gm7 | C7|
