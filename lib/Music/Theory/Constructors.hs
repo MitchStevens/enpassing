@@ -29,8 +29,28 @@ scale
 chord
 c [sharp] major [seventh]
 -}
-instance Constructor (Quality -> Chord) where
-  noteConstruct note quality = newChord (PitchClass note Natural) (triad quality)
+
+constructChord :: Note -> Maybe Accidental -> Maybe Quality -> [Interval] -> Chord
+constructChord note acc quality exts =
+  let acc' = fromMaybe Natural acc
+      quality' = fromMaybe Major quality
+  in
+    newChord (PitchClass note acc') (triad quality' <> exts)
+
+instance Constructor (Accidental -> Quality -> [Interval] -> Chord) where
+  noteConstruct note acc qual exts = constructChord note (Just acc) (Just qual) exts
+instance Constructor (              Quality -> [Interval] -> Chord) where
+  noteConstruct note qual exts = constructChord note Nothing (Just qual) exts
+instance Constructor (Accidental ->            [Interval] -> Chord) where
+  noteConstruct note acc exts = constructChord note (Just acc) Nothing exts
+instance Constructor (                         [Interval] -> Chord) where
+  noteConstruct note exts = constructChord note Nothing Nothing exts
+instance Constructor (Accidental -> Quality ->               Chord) where
+  noteConstruct note acc qual = constructChord note (Just acc) (Just qual) []
+instance Constructor (              Quality ->               Chord) where
+  noteConstruct note qual = constructChord note Nothing (Just qual) []
+instance Constructor (Accidental ->                          Chord) where
+  noteConstruct note acc = constructChord note (Just acc) Nothing []
 
 c, d, e, f, g, a, b :: Constructor c => c
 c = noteConstruct C

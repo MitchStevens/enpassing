@@ -28,13 +28,6 @@ instance Eq Interval where
 instance Ord Interval where
   compare = compare `on` steps
 
-instance Show Interval where
-  show (Interval Major degree)
-      | isPerfect degree = "Perfect" <> show degree
-      | otherwise        = "Major" <> show degree
-  show (Interval quality degree) = 
-    show quality <> " " <> show degree
-
 instance Num Interval where
   a + b = stepsToInterval (steps a + steps b)
   a - b = stepsToInterval (steps a - steps b)
@@ -42,22 +35,6 @@ instance Num Interval where
   abs = id
   signum = id
   fromInteger = stepsToInterval . fromInteger
-
-{-
-
--}
-instance IsString Interval where
-  fromString (c1:c2:[]) =
-    let
-      d = mkDegree (digitToInt c2)
-      q = case c1 of
-        'M' -> Major
-        'P' -> Perfect
-        'm' -> Minor
-        'd' -> Diminished
-        'A' -> Augmented
-    in
-      if isDigit c2 then newInterval q d else error ""
 
 instance Enum Interval where
   toEnum = stepsToInterval
@@ -116,7 +93,7 @@ stepsToInterval n = Interval quality degree'
 
 triad :: Quality -> [Interval]
 triad = \case
-  Major -> ["P1", "m3", "P5"]
-  Minor -> ["P1", "M3", "P5"]
+  Major -> ["P1", "M3", "P5"]
+  Minor -> ["P1", "m3", "P5"]
   Diminished -> ["P1", "m3", "d5"]
   Augmented -> ["P1", "M3", "A5"]

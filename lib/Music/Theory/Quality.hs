@@ -14,15 +14,21 @@ data Quality = Diminished | Minor | Major | Augmented
 pattern Perfect = Major
 
 data ChordQuality
-  = DiminishedChord 
-  | MinorChord
+  = MinorChord
+  | DominantChord
   | MajorChord
   | AugmentedChord
+  | DiminishedChord
   | Sus2Chord
   | Sus4Chord
 
 instance Show Quality where
-  show _ = ""
+  show = \case
+    Diminished -> "dim"
+    Minor -> "min"
+    Major -> "maj"
+    Augmented -> "aug"
+
 
 class ConstructQuality s where
   constructQuality :: Quality -> s

@@ -1,6 +1,8 @@
 module Music.Theory.Chord where
 
 import Control.Lens hiding (below)
+import Text.Printf
+import Data.Maybe
 import Data.Function
 
 import Music.Theory.Accidental
@@ -50,30 +52,43 @@ newSymbol = ChordSymbol
 newChord :: PitchClass -> [Interval] -> Chord
 newChord = Chord
 
----
+exts :: ChordLike chord => chord -> [Interval]
+exts = filter ((>5). intervalDegree) . arpeggiate
+
+--- Show Chords
+instance Show Chord where
+  show chord = fromMaybe chordDescription $ do
+    let rootNote = chord ^. root . to (show @PitchClass)
+    quality <- chord ^? qual . to show
+    let extensions = exts chord
+    pure $ printf "%s%s" rootNote quality
+      where chordDescription = "couldn't show chord!;"
+
+
+--- ScaleLike & ChordLike
 class ScaleLike s => ChordLike s
 
 instance ScaleLike ChordSymbol where
   type NoteType ChordSymbol = Interval
-  degree d = csIntervals . traverse . filtered (d==.intervalDegree)
+  degree d = csIntervals . traverse . filtered ((d==) . intervalDegree)
   arpeggiate = view csIntervals
 instance ChordLike ChordSymbol
 
 instance ScaleLike Chord where
   type NoteType Chord = PitchClass
-  degree d = cIntervals . traverse . filtered (d==.intervalDegree)
+  degree d = cIntervals . traverse . filtered ((d==) . intervalDegree)
   arpeggiate (Chord root intervals) = (`shift` root) <$> intervals
 instance ChordLike Chord
 
 instance ScaleLike chord => ScaleLike (Slash chord) where
   type NoteType (Slash chord) = NoteType chord
-  interval i = slashChord . interval i
+  degree d = slashChord . degree d
   arpeggiate (Slash bass chord) = bass : arpeggiate chord
 instance ChordLike chord => ChordLike (Slash chord)
 
 instance ScaleLike chord => ScaleLike (Inversion chord) where
   type NoteType (Inversion chord) = NoteType chord
-  interval i = inversionChord . interval i
+  degree d = inversionChord . degree d
   arpeggiate (Inversion num chord) = rotate num (arpeggiate chord)
     where rotate n list = drop n list <> take n list
 instance ChordLike chord => ChordLike (Inversion chord)
@@ -111,5 +126,3 @@ instance Transpose chord => Transpose (Inversion chord) where
 --useful for initialising slash chords, eg. C / fMajor creates a slash chord
 (/) :: NoteType chord -> chord -> Slash chord
 (/) = Slash
-
-

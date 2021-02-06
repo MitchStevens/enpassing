@@ -18,11 +18,9 @@ extra-source-files:  ChangeLog.md
 common lib
   build-depends:      base >=4.13 && <4.14, 
                       array,
-                      attoparsec,
                       containers,
                       lens, 
-                      lens-properties,
-                      mtl, 
+                      mtl,
                       text
   default-extensions: AllowAmbiguousTypes,
                       TypeFamilies,
@@ -55,7 +53,6 @@ common lib
 
 library
   import: lib
-  other-modules:      Music.Parsers
   hs-source-dirs:     lib
 
 test-suite test
@@ -69,13 +66,8 @@ test-suite test
                       Test.Comparators
   hs-source-dirs:     lib, test
 
-executable chord-analyis
-  import:             lib
-  type:               exitcode-stdio-1.0
-  main:               ChordAnalysis/Main.hs
-  build-depends:
-
-  hs-source-dirs:     lib, chord-analysis
-    
-  
-
+executable demo
+  import: lib
+  main-is: Demo/Main.hs
+  other-modules: Demo.Progression
+  hs-source-dirs: lib, demo

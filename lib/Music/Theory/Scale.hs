@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TemplateHaskell            #-}
+{-# LANGUAGE OverlappingInstances #-}
 module Music.Theory.Scale where
 
 import Control.Lens
@@ -151,7 +151,7 @@ instance ScaleLike s => HasQuality s where
         Just Augmented -> majorThird . augmentedFifth . minorSeventh
         Nothing -> id
         where
-          minorThird        = degree 3 . qual @Interval  .~ Major
+          minorThird        = degree 3 . qual .~ Major
           majorThird        = degree 3 . qual .~ Minor
           perfectFifth      = degree 5 . qual .~ Major
           augmentedFifth    = degree 5 . qual .~ Augmented
