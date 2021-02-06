@@ -1,21 +1,18 @@
 module Test.Music.Theory.Degree (
-  runTests
+  tests
 ) where
 
-import Music.Parsers
 import Music.Theory.Degree
 
-import Data.Functor           (void)
 import Test.Hspec
 import Test.QuickCheck
 
-runTests :: IO ()
-runTests = hspec $
-  describe "Degree" $ pure ()
-
+tests :: Spec
+tests = describe "Degree" $ do
+  pure ()
 
 instance Arbitrary Degree where
-  arbitrary = Degree <$> choose (-1000, 1000)
+  arbitrary = Degree <$> choose (0, 13)
 
 --hunitTests :: IO ()
 --hunitTests = void . runTestTT . TestLabel "Degree" $ TestList

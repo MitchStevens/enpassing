@@ -1,0 +1,10 @@
+cradle:
+  cabal:
+    - path: "lib"
+      component: "lib:music-theory"
+
+    - path: "lib"
+      component: "music-theory:test:test"
+
+    - path: "test"
+      component: "music-theory:test:test"

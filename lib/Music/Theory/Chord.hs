@@ -70,13 +70,21 @@ class ScaleLike s => ChordLike s
 
 instance ScaleLike ChordSymbol where
   type NoteType ChordSymbol = Interval
+<<<<<<< HEAD
   degree d = csIntervals . traverse . filtered ((d==) . intervalDegree)
+=======
+  degree d = csIntervals . traverse . filtered ((d==).intervalDegree)
+>>>>>>> 92ee90feea328a3d8ed3db98c6f94d9960a40b70
   arpeggiate = view csIntervals
 instance ChordLike ChordSymbol
 
 instance ScaleLike Chord where
   type NoteType Chord = PitchClass
+<<<<<<< HEAD
   degree d = cIntervals . traverse . filtered ((d==) . intervalDegree)
+=======
+  degree d = cIntervals . traverse . filtered ((d==).intervalDegree)
+>>>>>>> 92ee90feea328a3d8ed3db98c6f94d9960a40b70
   arpeggiate (Chord root intervals) = (`shift` root) <$> intervals
 instance ChordLike Chord
 
