@@ -1,64 +1,47 @@
-
 # Datatypes
 
-```
-data NoteClass = ...
-data Note = Note NoteClass Int
+## Basic Musical Primitives
+- **Accidental**
+  - `Sharp`, `Natural`, `DoubleFlat`
 
-data Quality = Major | Minor | Diminished | Augmented
-newtype Degree = Degree Int
-newtype Interval = Interval Quality Degree
 
-newtype Scale = Scale [Interval]
+- **Note**: one of the first seven letters
+  - `A`, `C`, `G`
+- **PitchClass**: A note class with an accidental
+  - `Ab`, `C#`, `Ebb`, `F natural`
+- **Pitch**
 
-data ChordSymbol = ChordSymbol NoteClass Quality [Interval]
-data Chord = Chord [Interval]
+- **Quality**
+- **ChordQuality**
 
-class Slash s = ChordLike s => Slash { bass :: NoteType s, chord :: s }
-```
+- **Degree**
+- **Interval**
+
+
+## Scales
+- **Mode**
+- **Scale**
 
 ## Chords
+- **ChordSymbol**
+- **Chord**
+- **ChordPrecise**
+- **SlashChord**
+- **Inversion**
+
 
 # Classes
 
-## ScaleLike
-```
-class ScaleLike s
-  type NoteType s = *
-  interval :: Interval -> Traversal' s Interval
-  arpeggiate :: s -> [NoteType s]
-instance ScaleLike Scale
-instance ScaleLike ChordSymbol
-instance ScaleLike Chord
-instance ScaleLike s => ScaleLike (Slash s)
-```
+- **ScaleLike**
+- **ChordLike**
+- **Semitones**
+- **Transpose**
 
-## ChordLike
-```
-class ScaleLike s => ChordLike s
-instance ChordLike ChordSymbol
-instance ChordLike Chord
-instance ChordLike s => ChordLike (Slash s)
-```
 
-## Degree
-```
-degree :: ScaleLike s a => Degree -> Traversal' s a
-```
+# Lenses
 
-## Transpose
-```
-class Semitones t
-  steps :: t -> Int
-
-class Transpose t where
-  shift :: Integral n => n -> t -> t
-```
-
-## Lenses
-```
-root :: ScaleLike s => Traversal' s (NoteType s)
-quality :: ChordLike s => Traversal' s Quality
-exts :: ChordLike s => Traversal' s (NoteType s)
-bass :: SlashChord s -> Traversal s (NoteType s)
-```
+- **`root`**
+- **`quality`**
+- **`exts`**
+- **`bass`**
+- **`accidental`**

@@ -3,11 +3,8 @@ module Test.Music.Theory.Pitch where
 import           Music.Theory
 import Test.Music.Theory.Transpose
 
-import           Data.Functor     (void)
-import           Data.List        (sort)
 import           Test.Hspec
 import           Test.QuickCheck
-import           Text.Printf
 
 instance Arbitrary Note where
   arbitrary = elements [C, D, E, F, G, A, B]
@@ -18,8 +15,8 @@ instance Arbitrary PitchClass where
 instance Arbitrary Pitch where
   arbitrary = Pitch <$> arbitrary <*> arbitrary
 
-tests :: IO ()
-tests = hspec $ do
+tests :: Spec
+tests = do
   specPitchClass
   specPitch
 

@@ -6,10 +6,7 @@ module Music.Theory.Interval (
 ) where
 
 import Control.Lens
-import Control.Monad
 import Data.Function (on)
-import Data.Functor
-import Data.Maybe
 import Data.Char
 import Data.String
 
@@ -91,7 +88,7 @@ instance {- OVERLAPPING -} HasQuality Interval where
 newInterval :: Quality -> Degree -> Interval
 newInterval = Interval
 
--- intervalIso :: r -> Iso Interval r
+-- intervalIso :: r -> Iso Interval rl
 -- intervalIso root = iso (\i -> shift i root) (\r -> stepsToInterval (root `diff` r))
 
 stepsToInterval :: Int -> Interval

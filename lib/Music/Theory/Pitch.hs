@@ -70,4 +70,3 @@ instance Semitones Pitch where
 
 instance Transpose Pitch where
   shift n p = mkPitch (steps p + fromIntegral n)
-

@@ -1,11 +1,11 @@
-{-# LANGUAGE RankNTypes, TemplateHaskell            #-}
+{-# LANGUAGE RankNTypes, TemplateHaskell, IncoherentInstances  #-}
 module Music.Theory.Scale where
 
 import Control.Lens
-import Control.Monad
 import Data.List (intersect)
 import Data.Maybe (listToMaybe)
-import Data.Semigroup
+import Control.Monad.Fail
+import Control.Monad.Reader
 
 import Music.Theory.Accidental
 import Music.Theory.Degree
@@ -22,15 +22,32 @@ Operations of scales
   get the note in the scale
   taking a subscale
   range of a scale
+
+  in the context of a scale:
+    Int <--> NoteType s
+    Int <--> Interval
+    Interval <--> NoteType s
+
+  to define something as "scaleLike", you need to define two or
+more of these isomorphisms
 -}
 
 class ScaleLike s where
   type NoteType s :: *
-  degree :: Degree -> Traversal' s Interval
-  arpeggiate :: s -> [NoteType s]
+  findDegree    :: (MonadFail m, MonadReader s m) => Int -> m Degree
+  findNote      :: (MonadFail m, MonadReader s m) => Int -> m (NoteType s)
+  indexOfDegree :: (MonadFail m, MonadReader s m) => Degree -> m Int
+  indexOfNote   :: (MonadFail m, MonadReader s m) => NoteType s -> m Int
 
-interval :: ScaleLike s => Interval -> Traversal' s Interval
-interval (Interval q d) = degree d . filtered ((q==) . intervalQuality)
+  indexAllOf :: ScaleLike s => t Int -> Traversal' s Interval
+  indexAllOf
+
+  degree :: Degree -> Traversal' s Interval
+
+arpeggiate :: ScaleLike s => s -> [NoteType s]
+arpeggiate s = catMaybes $ bassNote : takeWhile isJust . map (runReaderT findNote s) $ [0..]
+  where
+    bassNote = runReaderT findNote s (-1)
 
 newtype Mode = Mode { _modeIntervals :: [Interval] }
 makeLenses ''Mode
@@ -55,7 +72,7 @@ instance Semitones Scale where
   steps = steps @PitchClass . view root
 
 instance Transpose Scale where
-  shift n = root %~ (shift n :: PitchClass -> PitchClass)
+  shift n = root %~ (shift @PitchClass n)
 
 instance HasRoot Scale PitchClass where
   root = scaleRoot
@@ -72,8 +89,11 @@ newMode intervals
 newScale :: PitchClass -> Mode -> Scale
 newScale = Scale 
 
---arpeggiate :: (HasRoot s r, HasTones s, Transpose r) => s -> [r]
---arpeggiate s = map (shift (s^.root)) (take cycle $ s^.tones)
+interval :: ScaleLike s => Interval -> Traversal' s Interval
+interval (Interval q d) = degree d . filtered ((q==) . intervalQuality)
+
+containsNote :: ScaleLike s => NoteType s -> Bool
+containsNote
 
 --findDegree :: Scale -> Prism' Pitch Degree
 --findDegree scale = prism' destruct construct
@@ -151,7 +171,7 @@ instance ScaleLike s => HasQuality s where
         Just Augmented -> majorThird . augmentedFifth . minorSeventh
         Nothing -> id
         where
-          minorThird        = degree 3 . qual @Interval  .~ Major
+          minorThird        = degree 3 . qual .~ Major
           majorThird        = degree 3 . qual .~ Minor
           perfectFifth      = degree 5 . qual .~ Major
           augmentedFifth    = degree 5 . qual .~ Augmented

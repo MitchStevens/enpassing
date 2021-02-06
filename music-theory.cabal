@@ -68,14 +68,3 @@ test-suite test
   other-modules:      Music.Parsers
                       Test.Comparators
   hs-source-dirs:     lib, test
-
-executable chord-analyis
-  import:             lib
-  type:               exitcode-stdio-1.0
-  main:               ChordAnalysis/Main.hs
-  build-depends:
-
-  hs-source-dirs:     lib, chord-analysis
-    
-  
-
