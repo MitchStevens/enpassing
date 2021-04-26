@@ -15,7 +15,7 @@ import Music.Theory.Transpose
 -}
 
 newtype Degree = Degree Int
-  deriving (Eq) via Int
+  deriving (Eq, Ord) via Int
 
 mkDegree :: Int -> Degree
 mkDegree = Degree . (1-)

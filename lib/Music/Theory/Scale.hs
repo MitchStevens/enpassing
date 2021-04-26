@@ -2,10 +2,7 @@
 module Music.Theory.Scale where
 
 import Control.Lens
-import Data.List (intersect)
-import Data.Maybe (listToMaybe)
-import Control.Monad.Fail
-import Control.Monad.Reader
+import Data.Functor
 
 import Music.Theory.Accidental
 import Music.Theory.Degree
@@ -14,6 +11,7 @@ import Music.Theory.Pitch
 import Music.Theory.Interval
 import Music.Theory.Transpose
 import Music.Theory.Classes
+import Music.Theory.MusicalBase
 
 {-
 A scale is a set of notes, ordered by pitch
@@ -32,100 +30,35 @@ Operations of scales
 more of these isomorphisms
 -}
 
-class ScaleLike s where
-  type NoteType s :: *
-  findDegree    :: (MonadFail m, MonadReader s m) => Int -> m Degree
-  findNote      :: (MonadFail m, MonadReader s m) => Int -> m (NoteType s)
-  indexOfDegree :: (MonadFail m, MonadReader s m) => Degree -> m Int
-  indexOfNote   :: (MonadFail m, MonadReader s m) => NoteType s -> m Int
+type Mode         = MusicalBase ()
+type Scale        = MusicalBase PitchClass
+type PreciseScale = MusicalBase Pitch
 
-  indexAllOf :: ScaleLike s => t Int -> Traversal' s Interval
-  indexAllOf
-
-  degree :: Degree -> Traversal' s Interval
-
-arpeggiate :: ScaleLike s => s -> [NoteType s]
-arpeggiate s = catMaybes $ bassNote : takeWhile isJust . map (runReaderT findNote s) $ [0..]
-  where
-    bassNote = runReaderT findNote s (-1)
-
-newtype Mode = Mode { _modeIntervals :: [Interval] }
-makeLenses ''Mode
-
-data Scale = Scale { _scaleRoot :: PitchClass, _scaleMode :: Mode }
-makeLenses ''Scale
-
---data TrueScale = TrueScale
-
-instance ScaleLike Mode where
-  type NoteType Mode = Interval
-  degree d = modeIntervals . traverse . filtered ((d==) . intervalDegree)
-  arpeggiate = _modeIntervals
-
-instance ScaleLike Scale where
-  type NoteType Scale = PitchClass
-  degree d = scaleMode . degree d
-  arpeggiate (Scale r mode) =
-    (`shift` r) <$> arpeggiate mode
-
-instance Semitones Scale where
-  steps = steps @PitchClass . view root
-
-instance Transpose Scale where
-  shift n = root %~ (shift @PitchClass n)
-
-instance HasRoot Scale PitchClass where
-  root = scaleRoot
-
-newMode :: [Interval] -> Mode
-newMode intervals
+mode :: [Interval] -> Mode
+mode intervals
   | notSorted = error ""
   | not (all inRange intervals) = error ""
-  | otherwise = Mode intervals
+  | otherwise = MusicalBase () intervals
   where
     notSorted = and $ zipWith (>) intervals (tail intervals)
     inRange n = 0 <= steps n && steps n < 12
-   
-newScale :: PitchClass -> Mode -> Scale
-newScale = Scale 
 
-interval :: ScaleLike s => Interval -> Traversal' s Interval
-interval (Interval q d) = degree d . filtered ((q==) . intervalQuality)
-
-containsNote :: ScaleLike s => NoteType s -> Bool
-containsNote
-
---findDegree :: Scale -> Prism' Pitch Degree
---findDegree scale = prism' destruct construct
---  where
---    destruct :: Degree -> Pitch
---    destruct deg =
---      let
---        (octave, notes) = divMod (deg^.re mkDegree - 1) (scale^.mode.to numNotes)-- n >= 0
---        halfSteps = sum . take notes $ getIntervals (scale^.mode)
---      in shift (12*octave + halfSteps) (scale^.root)
---
---    construct :: Pitch -> Maybe Degree
---    construct (Pitch p n) = do
---      index <- elemIndex p (toPitchClasses scale)
---      index ^? mkDegree
-
-numNotes :: ScaleLike s => s -> Int
-numNotes = length . arpeggiate
-
+scale :: a -> [Interval] -> MusicalBase a
+scale root intervals = mode intervals $> root
+    
 ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian :: Mode
 
-ionian     = Mode ["P1", "M2", "M3", "P4", "P5", "M6", "M7"]
+ionian     = mode ["P1", "M2", "M3", "P4", "P5", "M6", "M7"]
 dorian     = aeolian & degree VI  %~ flatten
 phrygian   = aeolian & degree II  %~ flatten
 lydian     = ionian  & degree IV  %~ flatten
 mixolydian = ionian  & degree VII %~ flatten
-aeolian    = Mode ["P1", "M2", "m3", "P4", "P5", "m6", "m7"]
-locrian    = Mode ["P1", "m2", "m3", "P4", "d5", "m6", "m7"]
+aeolian    = mode ["P1", "M2", "m3", "P4", "P5", "m6", "m7"]
+locrian    = mode ["P1", "m2", "m3", "P4", "d5", "m6", "m7"]
 
 diminished, augmented :: Mode
-diminished = Mode [2, 1, 2, 1, 2, 1, 2, 1]
-augmented  = Mode [3, 1, 3, 1, 3, 1]
+diminished = mode [2, 1, 2, 1, 2, 1, 2, 1]
+augmented  = mode [3, 1, 3, 1, 3, 1]
 
 {-
   What gives a scale/chord its quality?
@@ -138,7 +71,7 @@ augmented  = Mode [3, 1, 3, 1, 3, 1]
   - It must have a third
   - if it has a 5th, the quality should be correct
   - if it has a 7th, the quality should be correct
--}
+
 instance ScaleLike s => HasQuality s where
   qual = lens getQual (flip setQual) . _Just
     where
@@ -179,3 +112,4 @@ instance ScaleLike s => HasQuality s where
           majorSeventh      = degree 7 . qual .~ Major
           minorSeventh      = degree 7 . qual .~ Minor
           diminishedSeventh = degree 7 . qual .~ Diminished
+-}

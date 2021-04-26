@@ -18,6 +18,14 @@ class Semitones t where
 class Transpose t where
   shift :: Integral n => n -> t -> t
 
+--Trivial Instance, needed for instance `Semitones (NoteBase ())`
+instance Semitones () where
+  steps () = 0
+
+instance Transpose () where
+  shift _ () = ()
+
+
 instance Semitones Int where
   steps = id
 

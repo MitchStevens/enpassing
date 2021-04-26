@@ -1,72 +1,80 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PostfixOperators #-}
 module Music.Theory.Pitch where
 
-import           Control.Lens
+import           Control.Lens hiding ((#))
 import           Data.Function           (on)
 import Data.List (nub, sort)
 import           Data.Ord                (comparing)
+import Data.Foldable
 
 import           Music.Theory.Accidental
 import           Music.Theory.Transpose
 
-data Note = C | D | E | F | G | A | B
+data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Show, Enum, Bounded)
 
-instance Semitones Note where
+instance Semitones NoteName where
   steps n =  case n of
     { C -> 0; D -> 2; E -> 4; F -> 5
     ; G -> 7; A -> 9; B -> 11 }
+    
+data NoteBase a = NoteBase
+  { _noteName :: NoteName
+  , _noteAccidental :: Accidental
+  , _noteOctave :: a }
+makeLenses ''NoteBase
 
-data PitchClass = PitchClass { _pcNote :: Note, _pcAccidental :: Accidental }
-makeLenses ''PitchClass
+-- notes without octave
+type PitchClass = NoteBase ()
+-- notes with octave
+type Pitch      = NoteBase Int
 
-instance Eq PitchClass where
+-- PitchClass: A Note with an accidental
+instance Semitones (NoteBase a) => Eq (NoteBase a) where
   (==) = (==) `on` steps
 
 instance Show PitchClass where
-  show (PitchClass note acc) = show note <> show acc
+  show p = fold [p^.noteName.to show, p^.accidental.to show]
+instance Show Pitch where
+  show p = fold [p^.noteName.to show, p^.accidental.to show, p^.noteOctave.to show]
 
-instance Ord PitchClass where
+instance Semitones a => Ord (NoteBase a) where
   compare = compare `on` steps
 
-instance Semitones PitchClass where
-  steps (PitchClass note acc) = mod12 (steps acc + steps note)
+instance Functor NoteBase where
+  fmap = over noteOctave
+
+instance Semitones a => Semitones (NoteBase a) where
+  steps nb = sum $
+    [nb^.noteName.to steps, nb^.accidental.to steps, nb^.noteOctave.to steps]
 
 instance Transpose PitchClass where
-  shift n pc = pitchClass $ steps pc + fromIntegral n
+  shift n p = pitchClass $ steps p + fromIntegral n
+instance Transpose Pitch where
+  shift n p = pitch $ steps p + fromIntegral n
 
-instance HasAccidental PitchClass where
-  accidental = pcAccidental
+instance HasAccidental (NoteBase a) where
+  accidental = noteAccidental
 
-instance ConstructAccidental PitchClass Note where
-  constructAcc acc note = PitchClass note acc
-
+c, d, e, f, g, a, b :: PitchClass
+[c, d, e, f, g, a, b] = (\p -> NoteBase p Natural ()) <$> [C, D, E, F, G, A, B]
+  
+(#) :: NoteBase a -> NoteBase a
+(#) = set accidental Sharp
+(♭) :: NoteBase a -> NoteBase a
+(♭) = set accidental Flat
 
 allPitchClasses :: [PitchClass]
 allPitchClasses = nub . sort $
-  PitchClass
-    <$> [C, D, E, F, G, A, B]
-    <*> [Flat, Natural, Sharp]
+  [c, d, e, f, g, a, b] >>= (\n -> [(n#), n, (n♭)])
 
 pitchClass :: Int -> PitchClass
 pitchClass n = allPitchClasses !! mod12 n
 
+pitch :: Int -> Pitch
+pitch n = set noteOctave (div12 n) (pitchClass n)
 
---A Pitch is a pitchclass with an octave. Modeling a pitch in scientific notation.
-data Pitch = Pitch PitchClass Int deriving (Eq)
-
-mkPitch :: Int -> Pitch
-mkPitch n = Pitch (pitchClass n) (div12 n)
-
-instance Ord Pitch where
-  compare = comparing steps
-
-instance Show Pitch where
-  show (Pitch pc oct) = show pc <> show oct
-
-instance Semitones Pitch where
-  steps (Pitch pc octave) = steps pc + octave * 12
-
-instance Transpose Pitch where
-  shift n p = mkPitch (steps p + fromIntegral n)
+(%) :: NoteBase a -> b -> NoteBase b
+(%) p x = set noteOctave x p

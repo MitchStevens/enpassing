@@ -2,11 +2,15 @@ module Music.Theory.Classes where
 
 import Control.Lens
 
-import Music.Theory.Quality
+import Music.Theory.Interval
+import Music.Theory.Transpose
 
-class HasRoot s a where
+class HasRoot s a | s -> a where
   root :: Lens' s a
 
-class HasQuality s where
-  -- Should this be of type `Lens' s (Maybe Quality)`
-  qual :: Traversal' s Quality
+class HasIntervals s where
+  intervals :: Lens' s [Interval]
+
+arpeggiate :: (HasRoot t a, HasIntervals t, Transpose a) => t -> [a]
+arpeggiate t = (`shift` (t^.root)) <$> (t^.intervals)
+

@@ -1,17 +1,20 @@
 module Main where
 
-import Music.Theory
+import Test.Hspec
 
+import Music.Theory
 import Test.Music.Theory.Degree    as Degree
+import Test.Music.Theory.Chord     as Chord
 import Test.Music.Theory.Pitch     as Pitch
 import Test.Music.Theory.Transpose as Transpose
 
 
 main :: IO ()
-main = do
-  --Degree.runTests
+main = hspec $ do
+  Degree.tests
   Transpose.tests
   Pitch.tests
+  Chord.tests
   pure ()
 
 {-

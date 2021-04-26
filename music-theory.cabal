@@ -47,6 +47,7 @@ common lib
                       Music.Theory.Degree
                       Music.Theory.Interval
                       Music.Theory.Pitch
+                      Music.Theory.MusicalBase
                       Music.Theory.Quality
                       Music.Theory.Scale
                       Music.Theory.Transpose
@@ -54,17 +55,19 @@ common lib
 
 
 library
-  import: lib
-  other-modules:      Music.Parsers
+  import:             lib
+  other-modules:
   hs-source-dirs:     lib
 
 test-suite test
   import: lib
   type:               exitcode-stdio-1.0
   main-is:            Test/Main.hs
-  build-depends:      lens-properties,
+  build-depends:      QuickCheck,
                       hspec,
-                      QuickCheck,
+                      validity,
+                      genvalidity,
+                      genvalidity-hspec-optics
   other-modules:      Music.Parsers
                       Test.Comparators
   hs-source-dirs:     lib, test
