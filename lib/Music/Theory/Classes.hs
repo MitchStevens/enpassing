@@ -13,4 +13,3 @@ class HasIntervals s where
 
 arpeggiate :: (HasRoot t a, HasIntervals t, Transpose a) => t -> [a]
 arpeggiate t = (`shift` (t^.root)) <$> (t^.intervals)
-

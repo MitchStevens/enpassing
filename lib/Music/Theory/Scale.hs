@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+{-# LANGUAGE OverlappingInstances #-}
+=======
 {-# LANGUAGE RankNTypes, TemplateHaskell, IncoherentInstances  #-}
+>>>>>>> 92ee90feea328a3d8ed3db98c6f94d9960a40b70
 module Music.Theory.Scale where
 
 import Control.Lens

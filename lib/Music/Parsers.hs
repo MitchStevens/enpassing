@@ -1,7 +1,6 @@
 {-# LANGUAGE LambdaCase, MultiWayIf #-}
-module Music.Parsers where
+module Music.Theory.Parsers where
 
---import           Music.Theory
 --
 --import           Control.Monad
 --import           Data.Maybe             (maybeToList, fromMaybe)
@@ -10,141 +9,150 @@ module Music.Parsers where
 --import qualified Data.Text.IO           as T (readFile)
 --import           Data.Attoparsec.Combinator (lookAhead)
 --import           Data.Attoparsec.Text       hiding (D, I)
---import           Data.Char                  (isAlpha, isLower, isSpace, isUpper,
---                                             toLower, toUpper)
+
 --import Data.Functor
 --import Control.Lens
 --import Control.Applicative
 --import Data.List
---
---class Parseable a where
---  parser :: Parser a
---  unparse :: a -> String
---
---
---instance Parseable Note where
---  parser = choice
---    [ char 'A' $> A
---    , char 'B' $> B
---    , char 'C' $> C
---    , char 'D' $> D
---    , char 'E' $> E
---    , char 'F' $> F
---    , char 'G' $> G ]
---
---  unparse = show
---
---
---instance Parseable PitchClass where
---  parser = do
---    note <- parser
---    acc <- option natural $ choice
---      [ char '#' $> sharp
---      , char 'b' $> flat ]
---    pure (acc note)
---
---  unparse p = case p^._Wrapped of
---    Flat    n -> unparse n <> "b"
---    Natural n -> unparse n
---    Sharp   n -> unparse n <> "#"
---
---
---parserAccidental :: Parser a -> Parser (Accidental a)
---parserAccidental parser = choice
---  [ char '#' $> Sharp   <*> parser
---  , char 'b' $> Flat    <*> parser
---  , ("add" <|> "") $> Natural <*> parser]
---
---unparseAccidental :: (a -> String) -> (Accidental a -> String)
---unparseAccidental unparse = \case
---  Flat x    -> "b" <> unparse x
---  Natural x -> unparse x
---  Sharp x   -> "#" <> unparse x
---
---
----- Taken from https://rosettacode.org/wiki/Roman_numerals/Decode#Fold
---instance Parseable Degree where
---  parser = let
---      romanParser :: Parser [Int]
---      romanParser = many' . choice $ zipWith
---        (\c n -> (char (toLower c) <|> char c) $> n)
---        "IVXLCDM"
---        [1, 5, 10, 50, 100, 500, 1000]
---
---      acc :: (Int, Int) -> Int -> (Int, Int)
---      acc (partial, old) new =
---        if new <= old
---          then (partial + old, new)
---          else (partial - old, new)
---    in do
---      numerals <- romanParser
---      let (partial, last) = foldl' acc (0, 0) numerals
---      either (fail . show) pure (matching mkDegree (partial + last))
---
---  unparse (Degree n) =
---    let
---      f :: Char -> Char -> Char -> Int -> String
---      f x v i n = case mod n 10 of
---        0 -> ""
---        1 -> [i]
---        2 -> [i,i]
---        3 -> [i,i,i]
---        4 -> [i,v]
---        5 -> [v]
---        6 -> [v,i]
---        7 -> [v,i,i]
---        8 -> [v,i,i,i]
---        9 -> [i,x]
---
---      ones      = div n 1
---      tens      = div n 10
---      hundreds  = div n 100
---      thousands = div n 1000
---    in mconcat
---      [ replicate thousands 'M'
---      , f 'M' 'D' 'C' hundreds
---      , f 'C' 'L' 'X' tens
---      , f 'X' 'V' 'I' ones ]
---
---
-----Should DegreeNum be a wrapper?
---parserDegreeNum :: Parser Degree
---parserDegreeNum = do
---  n <- decimal
---  maybe (fail "DegreeNum parse ") pure (n ^? mkDegree)
---
---unparseDegreeNum :: Degree -> String
---unparseDegreeNum (Degree d) = show d
---
---instance Parseable a => Parseable (LetterCase a) where
---  parser = do
---    (text, a) <- match parser
---    if | T.all isUpper text -> pure (Upper a)
---       | T.all isLower text -> pure (Lower a)
---       | otherwise          -> fail "couldn't parse lettercase"
---
---  unparse = \case
---    Upper x -> map toUpper (unparse x)
---    Lower x -> map toLower (unparse x)
---
---instance Parseable Mode where
---  parser = option Mixolydian $ choice
---    [ ("Maj" <|> "maj") $> ionian
---    , ("Min" <|> "min") $> aeolian
---    , ("M" <|> "Δ") $> ionian
---    , ("m" <|> "-") $> aeolian
---    , "dom" $> mixolydian
---    , ("+" <|> "aug") $> augmented
---    , ("o" <|> "dim") $> diminished ]
---
---  unparse = \case
---    Aeolian    -> "min"
---    Ionian     -> "maj"
---    Mixolydian -> ""
---    Augmented  -> "+"
---    Diminished -> "o"
---    _          -> error "Mode Parse Error"
---
+import Data.Char
+import Text.ParserCombinators.ReadP
+
+import Music.Theory
+
+readInt :: ReadP Int
+readInt = munch1 isDigit
+
+readNote :: ReadP Note
+readNote = char 'A' $> A
+       <|> char 'B' $> B
+       <|> char 'C' $> C
+       <|> char 'D' $> D
+       <|> char 'E' $> E
+       <|> char 'F' $> F
+       <|> char 'G' $> G
+
+readPitchClass :: ReadP PitchClass
+readPitchClass = do
+  note <- readNote
+  acc <- option natural $ choice
+  [ char '#' $> sharp
+  , char 'b' $> flat ]
+  pure (acc note)
+
+readAccidental :: ReadP Accidental
+readAccidental = char '#' $> Sharp
+             <|> char 'b' $> Flat
+             <|> string "" $> Natural
+
+-- Taken from https://rosettacode.org/wiki/Roman_numerals/Decode#Fold
+readDegree :: ReadP Degree
+readDegree = do
+      numerals <- romanParser
+      either (fail . show) pure (matching mkDegree (partial + last))
+      where
+        (partial, last) = foldl' acc (0, 0) numerals
+
+        romanParser :: Parser [Int]
+        romanParser =
+          many' . choice $
+            zipWith
+            (\c n -> (satisy ((c==) . toUpper) $> n)
+            "IVXLCDM"
+            [1, 5, 10, 50, 100, 500, 1000]
+
+        acc :: (Int, Int) -> Int -> (Int, Int)
+        acc (partial, old) new =
+        if new <= old
+          then (partial + old, new)
+          else (partial - old, new)
+
+instance Read Degree where
+  readsPrec _ = readR_to_S readDegree
+
+instance Show Degree where
+  show (Degree n) =
+    let
+      f :: Char -> Char -> Char -> Int -> String
+      f x v i n = case mod n 10 of
+        0 -> ""
+        1 -> [i]
+        2 -> [i,i]
+        3 -> [i,i,i]
+        4 -> [i,v]
+        5 -> [v]
+        6 -> [v,i]
+        7 -> [v,i,i]
+        8 -> [v,i,i,i]
+        9 -> [i,x]
+
+      ones      = div n 1
+      tens      = div n 10
+      hundreds  = div n 100
+      thousands = div n 1000
+    in mconcat
+      [ replicate thousands 'M'
+      , f 'M' 'D' 'C' hundreds
+      , f 'C' 'L' 'X' tens
+      , f 'X' 'V' 'I' ones ]
+
+readInterval :: ReadP Interval
+readInterval = do
+  d <- read @Int <$> munch1 isDigit
+  q <- char 'M' $> Major
+   <|> char 'P' $> Perfect
+   <|> char 'm' $> Minor
+   <|> char 'd' $> Diminished
+   <|> char 'A' $> Augmented
+  pure (newInterval q d)
+
+instance Read Interval where
+  readsPrec _ = readR_to_S readInterval
+
+instance IsString Interval where
+  fromString = read
+
+instance Show Interval where
+  show (Interval quality degree) =
+    let
+      qualStr = case quality of
+        Major -> if isPerfect degree then "Perfect" else "Major"
+        _     -> show quality
+    in
+      qualStr <> " " <> show degree
+
+-- Chord Quality
+readChordQuality :: ReadP ChordQuality
+readChordQuality =
+      (string "Maj" <|> string "maj") $> MajorChord
+  <|> (string "Min" <|> string "min") $> MinorChord
+  <|> (string "M"   <|> string "Δ") $> MajorChord
+  <|> (string "m"   <|> string "-") $> MinorChord
+  <|> (string "+"   <|> string "aug") $> AugmentedChord
+  <|> (string "o"   <|> string "dim") $> DiminishedChord
+  <|> string "sus2" $> Sus2Chord
+  <|> string "sus4" $> Sus4Chord
+  <|> string "" $> DominantChord
+
+instance Read ChordQuality where
+  readsPrec _ readP_to_S readChordQuality
+
+instance Show ChordQuality where
+  show = \case
+    MinorChord      -> "m"
+    DominantChord   -> ""
+    MajorChord      -> "maj"
+    AugmentedChord  -> "aug"
+    DiminishedChord -> "dim"
+    Sus2Chord       -> "sus2"
+    Sus4Chord       -> "sus4"
+    _               -> error "Mode Parse Error"
+
+-- Extensions
+-- 6, 7, 9, 11, 13
+readExtension :: ReadP Interval
+readExtension = do
+  acc <- readAccidental
+
 --instance Parseable Extension where
 --  parser = choice
 --    [ Acc <$> parserAccidental parserDegreeNum

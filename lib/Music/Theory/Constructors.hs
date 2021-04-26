@@ -8,4 +8,3 @@ import Music.Theory.Chord
 import Music.Theory.Interval
 import Music.Theory.Quality
 import Music.Theory.Scale
-import Music.Theory.Pitch

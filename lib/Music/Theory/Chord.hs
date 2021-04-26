@@ -1,6 +1,8 @@
 module Music.Theory.Chord where
 
 import Control.Lens hiding (below)
+import Text.Printf
+import Data.Maybe
 import Data.Function
 
 import Music.Theory.Accidental
@@ -36,8 +38,27 @@ instance Show ChordPrecise where
   show _ = ""
 
 
+newSymbol :: Degree -> [Interval] -> ChordSymbol
+newSymbol = ChordSymbol
+
+newChord :: PitchClass -> [Interval] -> Chord
+newChord = Chord
+
+exts :: ChordLike chord => chord -> [Interval]
+exts = filter ((>5). intervalDegree) . arpeggiate
+
+--- Show Chords
+instance Show Chord where
+  show chord = fromMaybe chordDescription $ do
+    let rootNote = chord ^. root . to (show @PitchClass)
+    quality <- chord ^? qual . to show
+    let extensions = exts chord
+    pure $ printf "%s%s" rootNote quality
+      where chordDescription = "couldn't show chord!;"
 
 
+--- ScaleLike & ChordLike
+class ScaleLike s => ChordLike s
 
 chord :: a -> ChordQuality -> [Interval] -> MusicalBase a
 chord root qual exts = MusicalBase root (triad qual <> exts)

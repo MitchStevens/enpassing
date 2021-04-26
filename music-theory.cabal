@@ -18,11 +18,9 @@ extra-source-files:  ChangeLog.md
 common lib
   build-depends:      base >=4.13 && <4.14, 
                       array,
-                      attoparsec,
                       containers,
                       lens, 
-                      lens-properties,
-                      mtl, 
+                      mtl,
                       text
   default-extensions: AllowAmbiguousTypes,
                       TypeFamilies,
@@ -55,7 +53,7 @@ common lib
 
 
 library
-  import:             lib
+  import: lib
   other-modules:
   hs-source-dirs:     lib
 

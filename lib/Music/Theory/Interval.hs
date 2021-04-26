@@ -109,11 +109,9 @@ stepsToInterval n = Interval quality degree'
 
 triad :: ChordQuality -> [Interval]
 triad = \case
-  Q.Major ->      ["P1", "m3", "P5"]
-  Q.Minor ->      ["P1", "M3", "P5"]
+  Q.Major      -> ["P1", "m3", "P5"]
+  Q.Minor      -> ["P1", "M3", "P5"]
   Q.Diminished -> ["P1", "m3", "d5"]
-  Q.Augmented ->  ["P1", "M3", "A5"]
-  Q.Sus2 ->       ["P1", "M2", "P5"]
-  Q.Sus4 ->       ["P1", "P4", "P5"]
-  
-
+  Q.Augmented  -> ["P1", "M3", "A5"]
+  Q.Sus2       -> ["P1", "M2", "P5"]
+  Q.Sus4       -> ["P1", "P4", "P5"]
