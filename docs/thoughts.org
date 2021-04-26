@@ -1,0 +1,42 @@
+#+TITLE: Thoughts
+
+Scales and chords are musical traversables
+
+A musical traversable is either abstract or concrete (refers to things that can and cannot be played)
+
+Providing context to musical traversables?
+
+are there some operations over mts that only make sense with additional context?
+
+the (lack of) ocntext must be encoded in the type for a operation to proceed
+
+is the chord `C, Eb, E, G` major or minor? (invalid chord!)
+
+is the chord `C4, Eb5, E4, G4` major or minor? (minor)
+
+some musical traversables are so wacky they can't be analysed, can we encode this in the type signature?
+
+order is important
+
+encode facts about the chord in the type sig?
+- no that sucks
+#+begin_src haskell
+data MusicalTraversable x a = Musical [a]
+type Chord a = MusicalTraversable Chord' a
+type Scale a = MusicalTraversable Scale' a
+
+class HasRoot mt where
+  root :: Lens' (mt a) a
+
+class HasQuality mt where
+  qual :: Lens' (mt a) (Maybe Quality)
+
+class HasDegree mt where
+  degree :: Degree -> Lens' (mt a) a
+
+
+
+arpeggiate :: MusicalTraversable x a -> [a]
+degenerate :: MusicalTraversable x a -> Bool
+
+#+end_src

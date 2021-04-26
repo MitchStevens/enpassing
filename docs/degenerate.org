@@ -1,0 +1,11 @@
+#+TITLE: Degenerate
+
+musical traversables are called "degenerate" if they contain two notes of the same degree
+
+
+#+begin_src haskell
+class HasDegree mt where
+  degree :: Degree -> Lens' (mt a) Interval
+
+
+#+end_src
