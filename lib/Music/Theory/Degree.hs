@@ -115,14 +115,3 @@ alpha (Degree n) = case n of
 
 isPerfect :: Degree -> Bool
 isPerfect = (`elem` [0, 3, 4]) . (`mod` 7) . unDegree
-
-chordRelevance :: Degree -> Int
-chordRelevance = \case
-  [ I, III, VII, XIII, VI,   ]
-  I -> 0
-  III -> 1
-  VII -> 2
-  IX -> 3
-  XI -> 4
-  XIII -> 5
-  VI -> 6

@@ -1,27 +1,31 @@
 module Music.Theory.MusicalBase where
 
 import Control.Lens
+import Control.Monad
 import Data.Function
+import Data.Functor
 import Data.List
 import Data.Maybe
-import Control.Monad
 
 import Music.Theory.Degree
 import Music.Theory.Interval
 import Music.Theory.Classes
 import Music.Theory.Transpose
 
-data MusicalBase a = MusicalBase { _base :: !a, _offsets :: ![Interval] }
+{-
+  A datatype used to model scales and chords. The phantom type `x` is used to j
+-}
+data MusicalBase x a = MusicalBase { _base :: !a, _offsets :: ![Interval] }
   deriving (Eq)
 makeLenses ''MusicalBase
 
-instance Functor MusicalBase where
+instance Functor (MusicalBase x) where
   fmap = over base
 
-instance HasRoot (MusicalBase a) a where
+instance HasRoot (MusicalBase x a) a where
   root = base
 
-instance HasIntervals (MusicalBase a) where
+instance HasIntervals (MusicalBase x a) where
   intervals = offsets
 
 degree :: HasIntervals s => Degree -> Traversal' s Interval
@@ -35,9 +39,9 @@ isDegenerate music = and $ zipWith ((>) `on` intervalDegree) sortedIntervals (ta
   where sortedIntervals = music^.intervals.to sort
 
 noteFromInterval :: (HasRoot (f a) a, HasIntervals (f a), Transpose a) => f a -> Interval -> Maybe a
-noteFromInterval fa i = do
+noteFromInterval fa i =
   guard (anyOf (intervals.traverse) (i==) fa)
-  pure (shift i (fa^.root))
+    $> shift i (fa^.root)
 
 intervalFromNote :: (HasRoot s a, HasIntervals s, Semitones a, Transpose a) => s -> a -> Maybe Interval
 intervalFromNote fa a = findOf (intervals.traverse) (\i -> steps (shift i (fa^.root)) == steps a) fa

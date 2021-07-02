@@ -15,53 +15,32 @@ import Music.Theory.Quality
 import Music.Theory.Scale
 import Music.Theory.Transpose
 
-{-
-Chord Symbol:
- ChordSymbol: VIm
- Chord: Am7
- PreciseChord: A5 C5 E6 G6
--}
 
-type ChordType    = MusicalBase ()
-type ChordSymbol  = MusicalBase Degree
-type Chord        = MusicalBase PitchClass
-type ChordPrecise = MusicalBase Pitch
+data Chord'
+type Chord a = MusicalBase Chord' a
 
 -- TODO: create show instances for chords
-instance Show ChordType where
-  show _ = ""
-instance Show ChordSymbol where
-  show _ = ""
-instance Show Chord where
-  show _ = ""
-instance Show ChordPrecise where
+instance Show (Chord a) where
   show _ = ""
 
+newChord :: a -> [Interval] -> Chord a
+newChord = MusicalBase
 
-newSymbol :: Degree -> [Interval] -> ChordSymbol
-newSymbol = ChordSymbol
-
-newChord :: PitchClass -> [Interval] -> Chord
-newChord = Chord
-
-exts :: ChordLike chord => chord -> [Interval]
-exts = filter ((>5). intervalDegree) . arpeggiate
+exts :: Chord a -> [Interval]
+exts = over intervals (filter (greaterThan p5))
+  where p5 = stepsToInterval 7
 
 --- Show Chords
-instance Show Chord where
-  show chord = fromMaybe chordDescription $ do
-    let rootNote = chord ^. root . to (show @PitchClass)
-    quality <- chord ^? qual . to show
-    let extensions = exts chord
-    pure $ printf "%s%s" rootNote quality
-      where chordDescription = "couldn't show chord!;"
+--instance Show Chord where
+--  show chord = fromMaybe chordDescription $ do
+--    let rootNote = chord ^. root . to (show @PitchClass)
+--    quality <- chord ^? qual . to show
+--    let extensions = exts chord
+--    pure $ printf "%s%s" rootNote quality
+--      where chordDescription = "couldn't show chord!"
 
-
---- ScaleLike & ChordLike
-class ScaleLike s => ChordLike s
-
-chord :: a -> ChordQuality -> [Interval] -> MusicalBase a
-chord root qual exts = MusicalBase root (triad qual <> exts)
+chord :: a -> ChordQuality -> [Interval] -> Chord a
+chord root qual exts = newChord root (triad qual <> exts)
 
 -- Variations on chords
 (/) :: (HasRoot (chord a) a, HasIntervals (chord a), Semitones a) => a -> chord a -> chord a

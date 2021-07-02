@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 {-# LANGUAGE OverlappingInstances #-}
-=======
-{-# LANGUAGE RankNTypes, TemplateHaskell, IncoherentInstances  #-}
->>>>>>> 92ee90feea328a3d8ed3db98c6f94d9960a40b70
 module Music.Theory.Scale where
 
 import Control.Lens
@@ -34,9 +30,10 @@ Operations of scales
 more of these isomorphisms
 -}
 
-type Mode         = MusicalBase ()
-type Scale        = MusicalBase PitchClass
-type PreciseScale = MusicalBase Pitch
+data Scale'
+type Scale a = MusicalBase Scale' a
+
+type Mode = Scale ()
 
 mode :: [Interval] -> Mode
 mode intervals
@@ -47,7 +44,7 @@ mode intervals
     notSorted = and $ zipWith (>) intervals (tail intervals)
     inRange n = 0 <= steps n && steps n < 12
 
-scale :: a -> [Interval] -> MusicalBase a
+scale :: a -> [Interval] -> Scale a
 scale root intervals = mode intervals $> root
     
 ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian :: Mode
