@@ -1,0 +1,91 @@
+#+TITLE: Transposition
+
+* Semitone Objects
+Semitone objects are sets with an instances of Semitones defined.
+#+begin_src haskell
+class Semitones t where
+  steps :: t -> Int
+#+end_src
+
+This instance also defines a relation
+#+begin_src
+s ~ t <=> steps s = mod12 (steps t)
+
+reflexive y
+symmetric y
+transitive
+
+assume s ~ t and t ~ u
+steps s = mod12 (steps t)
+        = mod12 (mod12 (steps u)) -- mod12 is idem.
+        = mod12 (steps u)
+thus s ~ u
+#+end_src
+
+* Transposable Objects
+A transposable object is a type with an instance of ~Transpose~.
+#+begin_src haskell
+class Transpose t where
+  shift :: Integral n => n -> t -> t
+#+end_src
+
+We can define a group operations (identity, addition, inverse) for any Semitone and Transposable object.
+#+begin_src
+0 = t - t
+s + t = shift (steps t) s
+- s = shift (- steps s) 0
+#+end_src
+
+For this object to be a group, we need to prove:
+#+begin_src
+(s+t)+u = s+(t+u)           associativity
+a+(-a) = (-a)+a = 0         inverse
+#+end_src
+
+The set of functions ~{shift n | n in Z}~ should also form a group
+#+begin_src
+0 = shift 0
+shift m + shift n = shift (m+n)
+- shift n = shift (-n)
+#+end_src
+
+* Transposition Property
+We need to relate the ~Semitones~ and ~Transpose~ classes. This is called the *strong transposition property*:
+~steps (shift n t) = steps t + n~
+
+The *strong transposition property* holds whenever ~steps~ is surjective. Proof:
+#+begin_src
+steps (shift n t)
+    = steps (shift (steps n') t) -- let n' be an value such that
+                                 -- steps n' = n
+    = steps (t + n')
+    = steps t + steps n'
+    = steps t + n
+#+end_src
+
+There is also a *weak transposition property*:
+~mod12 (steps n t) = mod12 (steps t + n)~
+TODO: When does this hold? When ~mod12 . steps~ is surjective???
+
+* Back into the real world
+We also want to transpose by an interval. An interval contains the number of semitones to transpose by, but also contains information about how the note should be spelled enharmonically.
+
+#+begin_src
+shift A4 C = F#
+shift D5 C = Gb
+#+end_src
+
+So what we really want is a function
+#+begin_src haskell
+class Transpose t where
+  shift :: Interval -> t -> t
+
+transpose :: Transpose t => Int -> t -> t
+transpose = shift . stepsToInterval
+
+shift :: Int -> t -> t
+#+end_src
+
+* Problems
+- No Diatonic Transposition
+  - Who cares! Nobody uses it

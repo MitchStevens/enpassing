@@ -12,16 +12,16 @@ module Music.Theory.Accidental (
   Accidental (..),
   HasAccidental, accidental,
   pattern DoubleFlat, pattern Flat, pattern Natural, pattern Sharp, pattern DoubleSharp,
-  doubleFlat, flat, natural, sharp, doubleSharp, 
-  _DoubleFlat, _Flat, _Natural, _Sharp, _DoubleSharp
+  flatten, sharpen,
 ) where
 
-import Music.Theory.Transpose
+import Music.Theory.Semitones
 
 import Control.Lens
 
 newtype Accidental = Offset Int
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Num)
+    via Int
 
 pattern DoubleFlat  = Offset (-2) :: Accidental
 pattern Flat        = Offset (-1) :: Accidental
@@ -44,23 +44,11 @@ class HasAccidental s where
 instance Semitones Accidental where
   steps (Offset n) = n
 
+flatten :: (HasAccidental t) => t -> t
+flatten = accidental %~ (+ Flat)
 
-doubleFlat, flat, natural, sharp, doubleSharp :: HasAccidental s => s -> s
-doubleFlat  = set accidental DoubleFlat
-flat        = set accidental Flat
-natural     = set accidental Natural
-sharp       = set accidental Sharp
-doubleSharp = set accidental DoubleSharp
+sharpen :: (HasAccidental t) => t -> t
+sharpen = accidental %~ (+ Sharp)
 
-flatten, sharpen :: HasAccidental s => s -> s
-flatten = over accidental (Offset . (\n -> n-1). steps)
-sharpen = over accidental (Offset . (\n -> n+1). steps)
-
-_DoubleFlat, _Flat, _Natural, _Sharp, _DoubleSharp 
-  :: HasAccidental s 
-  => Traversal' s ()
-_DoubleFlat  = accidental . only DoubleFlat
-_Flat        = accidental . only Flat
-_Natural     = accidental . only Natural
-_Sharp       = accidental . only Sharp
-_DoubleSharp = accidental . only DoubleSharp
+class Enharmonic s where
+  spell :: Accidental -> s -> s

@@ -9,6 +9,7 @@ import Data.Maybe
 
 import Music.Theory.Degree
 import Music.Theory.Interval
+import Music.Theory.Semitones
 import Music.Theory.Classes
 import Music.Theory.Transpose
 

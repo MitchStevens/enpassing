@@ -1,4 +1,3 @@
-{-# LANGUAGE DerivingVia, PatternSynonyms #-}
 module Music.Theory.Degree where
 
 import Control.Lens
@@ -8,17 +7,12 @@ import Data.Ord
 import Prelude
 
 import Music.Theory.Accidental
-import Music.Theory.Transpose 
+import Music.Theory.Semitones
 
-{-
-  A scale degree is like an index of a musical object. Scales have degrees, the 1st degree is the first note, the second is the second note, etc. Chords also have degrees, but chord degrees are different still. To keep implementation as simple as possible, degrees are just with an accident.
--}
-
-newtype Degree = Degree Int
-  deriving (Eq, Ord) via Int
+newtype Degree = Degree Int deriving (Eq, Ord)
 
 mkDegree :: Int -> Degree
-mkDegree = Degree . (1-)
+mkDegree n = Degree (n-1)
 
 unDegree :: Degree -> Int
 unDegree (Degree n) = n+1
@@ -67,7 +61,6 @@ instance Semitones Degree where
         5 -> 9
         6 -> 11
 
-  
 toRoman :: Int -> String
 toRoman x
   | x == 0 = ""

@@ -13,6 +13,7 @@ import Music.Theory.MusicalBase
 import Music.Theory.Pitch
 import Music.Theory.Quality
 import Music.Theory.Scale
+import Music.Theory.Semitones
 import Music.Theory.Transpose
 
 
@@ -33,8 +34,7 @@ newChord :: a -> [Interval] -> Chord a
 newChord = MusicalBase
 
 exts :: Chord a -> [Interval]
-exts = toListOf $ intervals . traverse . filtered (>p5)
-  where p5 = stepsToInterval 7 :: Interval
+exts = view $ intervals . to (filter (> "P5"))
 
 --- Show Chords
 --instance Show Chord where

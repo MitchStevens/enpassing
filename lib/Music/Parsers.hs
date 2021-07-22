@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 {-# LANGUAGE LambdaCase, MultiWayIf #-}
+=======
+>>>>>>> d161ec04822b65b1eaa7160435cecb521d055abe
 module Music.Parsers where
 
 --
@@ -10,10 +13,6 @@ module Music.Parsers where
 --import           Data.Attoparsec.Combinator (lookAhead)
 --import           Data.Attoparsec.Text       hiding (D, I)
 
---import Data.Functor
---import Control.Lens
---import Control.Applicative
---import Data.List
 import Data.Char
 import Text.ParserCombinators.ReadP
 
@@ -22,7 +21,7 @@ import Music.Theory
 readInt :: ReadP Int
 readInt = munch1 isDigit
 
-readNote :: ReadP Note
+readNote :: ReadP NoteName
 readNote = char 'A' $> A
        <|> char 'B' $> B
        <|> char 'C' $> C
@@ -34,10 +33,17 @@ readNote = char 'A' $> A
 readPitchClass :: ReadP PitchClass
 readPitchClass = do
   note <- readNote
+<<<<<<< HEAD
   acc <- option natural $ choice
     [ char '#' $> Sharp
     , char 'b' $> Flat ]
   pure (mkPitchClass note acc)
+=======
+  acc <- option Natural $ choice
+    [ (char '#' $> Sharp)
+    , (char 'b' $> Flat) ]
+  pure (acc note)
+>>>>>>> d161ec04822b65b1eaa7160435cecb521d055abe
 
 readAccidental :: ReadP Accidental
 readAccidental = char '#' $> Sharp
@@ -48,8 +54,11 @@ readAccidental = char '#' $> Sharp
 readDegree :: ReadP Degree
 readDegree = do
       numerals <- romanParser
-      either (fail . show) pure (matching mkDegree (partial + last))
+      case fromRoman numerals of
+        Just degree -> mkDegree degree
+        Nothing -> fail
       where
+<<<<<<< HEAD
         (partial, last) = foldl' acc (0, 0) numerals
 
         romanParser :: Parser [Int]
@@ -64,6 +73,19 @@ readDegree = do
         acc (partial, old) new
           | new <= old   = (partial + old, new)
           | otherwise    = (partial - old, new)
+=======
+        romanValues =
+          [ ('I', 1), ('V', 5), ('X', 10), ('L', 50)
+          , ('C', 50), ('D', 500), ('M', 1000) ]
+
+        fromRoman :: [Char] -> Maybe Int
+        fromRoman = map (+) . foldl f (0, 0) . traverse (`lookup` romanValues)
+          where
+            f :: (Int, Int) -> Int -> (Int, Int)
+            f (partial, old) new
+              | new <= old = (partial + old, new)
+              | otherwise  = (partial - old, new)
+>>>>>>> d161ec04822b65b1eaa7160435cecb521d055abe
 
 instance Read Degree where
   readsPrec _ = readR_to_S readDegree
@@ -107,9 +129,6 @@ readInterval = do
 instance Read Interval where
   readsPrec _ = readR_to_S readInterval
 
-instance IsString Interval where
-  fromString = read
-
 instance Show Interval where
   show (Interval quality degree) =
     let
@@ -133,18 +152,7 @@ readChordQuality =
   <|> string "" $> DominantChord
 
 instance Read ChordQuality where
-  readsPrec _ readP_to_S readChordQuality
-
-instance Show ChordQuality where
-  show = \case
-    MinorChord      -> "m"
-    DominantChord   -> ""
-    MajorChord      -> "maj"
-    AugmentedChord  -> "aug"
-    DiminishedChord -> "dim"
-    Sus2Chord       -> "sus2"
-    Sus4Chord       -> "sus4"
-    _               -> error "Mode Parse Error"
+  readsPrec _ = readP_to_S readChordQuality
 
 -- Extensions
 -- 6, 7, 9, 11, 13

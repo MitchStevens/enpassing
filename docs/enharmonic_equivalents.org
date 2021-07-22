@@ -1,0 +1,6 @@
+#+TITLE: Enharmonic Equivalents
+
+* Enharmonic: Same thing, different name
+Notes, Chords, Scales, Intervals can all have different spellings
+~shift~ should preserve enharmonic spelling
+    Intervaa
