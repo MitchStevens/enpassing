@@ -11,7 +11,8 @@ import Data.Char
 import Data.String
 
 import Music.Theory.Degree
-import Music.Theory.Transpose
+import Music.Theory.Semitones
+import Music.Theory.Accidental
 import  Music.Theory.Quality (ChordQuality)
 import qualified Music.Theory.Quality as Q
 
@@ -77,14 +78,31 @@ instance Semitones Interval where
       Diminished -> if isPerfect degree then (-1) else (-2)
       Augmented  -> 1
 
-instance Transpose Interval where
-  shift n = stepsToInterval . (fromIntegral n +) . steps
+-- this is a weird instance and may not obey laws, double check this
+-- This instance exists so we can use `flatten` and `sharpen` functions
+instance HasAccidental Interval where
+  accidental = lens get set
+    where
+      get (Interval quality degree) = case quality of
+        Major      -> Natural
+        Minor      -> Flat
+        Diminished -> if isPerfect degree then Flat else DoubleFlat
+        Augmented  -> Sharp
+      set interval@(Interval quality degree) acc
+        = maybe interval (\q -> Interval q degree) newQuality
+        where
+          newQuality = case acc of
+            DoubleFlat ->
+              if isPerfect degree then Nothing else Just Diminished
+            Flat ->
+              if isPerfect degree then Just Diminished else Just Minor
+            Natural ->
+              Just Major
+            Sharp ->
+              if isPerfect degree then Just Augmented else Nothing
+            _ -> Nothing
 
---instance ConstructQuality (Degree -> Interval) where
---  constructQuality = Interval
---
---instance {- OVERLAPPING -} HasQuality Interval where
---  qual = lens intervalQuality (\(Interval _ d) q -> Interval q d)
+
 
 stepsToInterval :: Int -> Interval
 stepsToInterval n = Interval quality degree'

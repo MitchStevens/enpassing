@@ -3,14 +3,15 @@
 {-# LANGUAGE PostfixOperators #-}
 module Music.Theory.Pitch where
 
-import           Control.Lens hiding ((#))
-import           Data.Function           (on)
+import Control.Lens hiding ((#))
+import Data.Function           (on)
 import Data.List (nub, sort)
-import           Data.Ord                (comparing)
+import Data.Ord                (comparing)
 import Data.Foldable
 
-import           Music.Theory.Accidental
-import           Music.Theory.Transpose
+import Music.Theory.Accidental
+import Music.Theory.Semitones
+import Music.Theory.Transpose
 
 data NoteName = C | D | E | F | G | A | B
   deriving (Eq, Show, Enum, Bounded)
@@ -32,13 +33,15 @@ type PitchClass = NoteBase ()
 type Pitch      = NoteBase Int
 
 -- PitchClass: A Note with an accidental
-instance Semitones (NoteBase a) => Eq (NoteBase a) where
+instance Semitones a => Eq (NoteBase a) where
   (==) = (==) `on` steps
 
 instance Show PitchClass where
-  show p = fold [p^.noteName.to show, p^.accidental.to show]
+  show (NoteBase noteName noteAccidental ()) =
+    show noteName <> show noteAccidental
 instance Show Pitch where
-  show p = fold [p^.noteName.to show, p^.accidental.to show, p^.noteOctave.to show]
+  show (NoteBase noteName noteAccidental noteOctave) =
+    show noteName <> show noteAccidental <> show noteOctave
 
 instance Semitones a => Ord (NoteBase a) where
   compare = compare `on` steps
@@ -47,7 +50,7 @@ instance Functor NoteBase where
   fmap = over noteOctave
 
 instance Semitones a => Semitones (NoteBase a) where
-  steps nb = sum $
+  steps nb = sum
     [nb^.noteName.to steps, nb^.accidental.to steps, nb^.noteOctave.to steps]
 
 instance Transpose PitchClass where

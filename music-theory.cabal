@@ -23,15 +23,16 @@ common lib
                       mtl,
                       text
   default-extensions: AllowAmbiguousTypes,
-                      TypeFamilies,
+                      --TypeFamilies,
                       OverloadedStrings,
                       FunctionalDependencies,
-                      UndecidableInstances,
-                      FlexibleContexts,
+                      DerivingVia,
+                      --UndecidableInstances,
+                      --FlexibleContexts,
                       FlexibleInstances,
                       LambdaCase,
                       MultiParamTypeClasses,
-                      NoMonomorphismRestriction,
+                      --NoMonomorphismRestriction,
                       PatternSynonyms,
                       RankNTypes,
                       ScopedTypeVariables,
@@ -44,10 +45,11 @@ common lib
                       Music.Theory.Constructors
                       Music.Theory.Degree
                       Music.Theory.Interval
-                      Music.Theory.Pitch
                       Music.Theory.MusicalBase
+                      Music.Theory.Pitch
                       Music.Theory.Quality
                       Music.Theory.Scale
+                      Music.Theory.Semitones
                       Music.Theory.Transpose
   default-language:   Haskell2010
 

@@ -1,4 +1,3 @@
-{-# LANGUAGE OverlappingInstances #-}
 module Music.Theory.Scale where
 
 import Control.Lens
@@ -6,12 +5,12 @@ import Data.Functor
 
 import Music.Theory.Accidental
 import Music.Theory.Degree
-import Music.Theory.Quality
-import Music.Theory.Pitch
 import Music.Theory.Interval
-import Music.Theory.Transpose
-import Music.Theory.Classes
 import Music.Theory.MusicalBase
+import Music.Theory.Pitch
+import Music.Theory.Quality
+import Music.Theory.Semitones
+import Music.Theory.Transpose
 
 {-
 A scale is a set of notes, ordered by pitch
@@ -46,16 +45,16 @@ mode intervals
 
 scale :: a -> [Interval] -> Scale a
 scale root intervals = mode intervals $> root
-    
-ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian :: Mode
 
+ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian :: Mode
 ionian     = mode ["P1", "M2", "M3", "P4", "P5", "M6", "M7"]
 dorian     = aeolian & degree VI  %~ flatten
 phrygian   = aeolian & degree II  %~ flatten
 lydian     = ionian  & degree IV  %~ flatten
 mixolydian = ionian  & degree VII %~ flatten
 aeolian    = mode ["P1", "M2", "m3", "P4", "P5", "m6", "m7"]
-locrian    = mode ["P1", "m2", "m3", "P4", "d5", "m6", "m7"]
+locrian    = aeolian & degree II  %~ flatten
+                     & degree V   %~ flatten
 
 diminished, augmented :: Mode
 diminished = mode [2, 1, 2, 1, 2, 1, 2, 1]

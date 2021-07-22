@@ -1,5 +1,4 @@
-{-# LANGUAGE LambdaCase, MultiWayIf #-}
-module Music.Theory.Parsers where
+module Music.Parsers where
 
 --
 --import           Control.Monad
@@ -10,10 +9,6 @@ module Music.Theory.Parsers where
 --import           Data.Attoparsec.Combinator (lookAhead)
 --import           Data.Attoparsec.Text       hiding (D, I)
 
---import Data.Functor
---import Control.Lens
---import Control.Applicative
---import Data.List
 import Data.Char
 import Text.ParserCombinators.ReadP
 
@@ -22,7 +17,7 @@ import Music.Theory
 readInt :: ReadP Int
 readInt = munch1 isDigit
 
-readNote :: ReadP Note
+readNote :: ReadP NoteName
 readNote = char 'A' $> A
        <|> char 'B' $> B
        <|> char 'C' $> C
@@ -34,9 +29,9 @@ readNote = char 'A' $> A
 readPitchClass :: ReadP PitchClass
 readPitchClass = do
   note <- readNote
-  acc <- option natural $ choice
-  [ char '#' $> sharp
-  , char 'b' $> flat ]
+  acc <- option Natural $ choice
+    [ (char '#' $> Sharp)
+    , (char 'b' $> Flat) ]
   pure (acc note)
 
 readAccidental :: ReadP Accidental
@@ -48,23 +43,21 @@ readAccidental = char '#' $> Sharp
 readDegree :: ReadP Degree
 readDegree = do
       numerals <- romanParser
-      either (fail . show) pure (matching mkDegree (partial + last))
+      case fromRoman numerals of
+        Just degree -> mkDegree degree
+        Nothing -> fail
       where
-        (partial, last) = foldl' acc (0, 0) numerals
+        romanValues =
+          [ ('I', 1), ('V', 5), ('X', 10), ('L', 50)
+          , ('C', 50), ('D', 500), ('M', 1000) ]
 
-        romanParser :: Parser [Int]
-        romanParser =
-          many' . choice $
-            zipWith
-            (\c n -> (satisy ((c==) . toUpper) $> n)
-            "IVXLCDM"
-            [1, 5, 10, 50, 100, 500, 1000]
-
-        acc :: (Int, Int) -> Int -> (Int, Int)
-        acc (partial, old) new =
-        if new <= old
-          then (partial + old, new)
-          else (partial - old, new)
+        fromRoman :: [Char] -> Maybe Int
+        fromRoman = map (+) . foldl f (0, 0) . traverse (`lookup` romanValues)
+          where
+            f :: (Int, Int) -> Int -> (Int, Int)
+            f (partial, old) new
+              | new <= old = (partial + old, new)
+              | otherwise  = (partial - old, new)
 
 instance Read Degree where
   readsPrec _ = readR_to_S readDegree
@@ -108,9 +101,6 @@ readInterval = do
 instance Read Interval where
   readsPrec _ = readR_to_S readInterval
 
-instance IsString Interval where
-  fromString = read
-
 instance Show Interval where
   show (Interval quality degree) =
     let
@@ -134,18 +124,7 @@ readChordQuality =
   <|> string "" $> DominantChord
 
 instance Read ChordQuality where
-  readsPrec _ readP_to_S readChordQuality
-
-instance Show ChordQuality where
-  show = \case
-    MinorChord      -> "m"
-    DominantChord   -> ""
-    MajorChord      -> "maj"
-    AugmentedChord  -> "aug"
-    DiminishedChord -> "dim"
-    Sus2Chord       -> "sus2"
-    Sus4Chord       -> "sus4"
-    _               -> error "Mode Parse Error"
+  readsPrec _ = readP_to_S readChordQuality
 
 -- Extensions
 -- 6, 7, 9, 11, 13
