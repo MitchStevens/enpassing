@@ -19,8 +19,25 @@ data IntervalQuality = Major | Minor | Diminished | Augmented deriving Show
 pattern Perfect = Major
 
 data Interval = Interval
-  { intervalQuality :: IntervalQuality
-  , intervalDegree :: Degree }
+  { _intervalQuality :: IntervalQuality
+  , _intervalDegree :: Degree }
+makeLenses ''Interval
+
+-- is there any reason I can't alias all the intervals like this?
+-- are 'I', 'V', or 'X' used by something else?
+pattern I    = Interval Major 0
+pattern II   = Interval Major 1
+pattern III  = Interval Major 2
+pattern IV   = Interval Major 3
+pattern V    = Interval Major 4
+pattern VI   = Interval Major 5
+pattern VII  = Interval Major 6
+pattern VIII = Interval Major 7
+pattern IX   = Interval Major 8
+pattern X    = Interval Major 9
+pattern XI   = Interval Major 10
+pattern XII  = Interval Major 11
+pattern XIII = Interval Major 12
 
 instance Eq Interval where
   (==) = (==) `on` steps

@@ -19,6 +19,12 @@ import Music.Theory.Transpose
 data Chord'
 type Chord a = MusicalBase Chord' a
 
+{-
+  Chord ()          = chords: minor, dominant 7th, major 9th
+  Chord PitchClass  = chords: Em, G9, Cm7(b5)
+  Chord Pitch       = chords: C5+E5+G5+B5+D6
+-}
+
 -- TODO: create show instances for chords
 instance Show (Chord a) where
   show _ = ""
@@ -27,8 +33,8 @@ newChord :: a -> [Interval] -> Chord a
 newChord = MusicalBase
 
 exts :: Chord a -> [Interval]
-exts = over intervals (filter (greaterThan p5))
-  where p5 = stepsToInterval 7
+exts = toListOf $ intervals . traverse . filtered (>p5)
+  where p5 = stepsToInterval 7 :: Interval
 
 --- Show Chords
 --instance Show Chord where

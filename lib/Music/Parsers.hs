@@ -1,5 +1,5 @@
 {-# LANGUAGE LambdaCase, MultiWayIf #-}
-module Music.Theory.Parsers where
+module Music.Parsers where
 
 --
 --import           Control.Monad
@@ -35,9 +35,9 @@ readPitchClass :: ReadP PitchClass
 readPitchClass = do
   note <- readNote
   acc <- option natural $ choice
-  [ char '#' $> sharp
-  , char 'b' $> flat ]
-  pure (acc note)
+    [ char '#' $> Sharp
+    , char 'b' $> Flat ]
+  pure (mkPitchClass note acc)
 
 readAccidental :: ReadP Accidental
 readAccidental = char '#' $> Sharp
@@ -61,10 +61,9 @@ readDegree = do
             [1, 5, 10, 50, 100, 500, 1000]
 
         acc :: (Int, Int) -> Int -> (Int, Int)
-        acc (partial, old) new =
-        if new <= old
-          then (partial + old, new)
-          else (partial - old, new)
+        acc (partial, old) new
+          | new <= old   = (partial + old, new)
+          | otherwise    = (partial - old, new)
 
 instance Read Degree where
   readsPrec _ = readR_to_S readDegree

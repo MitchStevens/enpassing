@@ -19,6 +19,7 @@ data MusicalBase x a = MusicalBase { _base :: !a, _offsets :: ![Interval] }
   deriving (Eq)
 makeLenses ''MusicalBase
 
+
 instance Functor (MusicalBase x) where
   fmap = over base
 
@@ -27,6 +28,15 @@ instance HasRoot (MusicalBase x a) a where
 
 instance HasIntervals (MusicalBase x a) where
   intervals = offsets
+
+--type instance Index (MusicalBase x a) = Int
+--type instance IxValue (MusicalBase x a) = a
+--instance Ixed (MusicalBase x a) where
+--  --ix :: Int -> Traveral' (MusicalBase x a) a
+--  --ix :: Int -> (a -> f a) -> (MusicalBase x a) -> f (MusicalBase x a)
+--  ix n afa (MusicalBase base offs) = ix n .~
+
+
 
 degree :: HasIntervals s => Degree -> Traversal' s Interval
 degree deg = intervals . traverse . filtered (\i -> intervalDegree i == deg)
@@ -38,16 +48,24 @@ isDegenerate :: (HasIntervals t) => t -> Bool
 isDegenerate music = and $ zipWith ((>) `on` intervalDegree) sortedIntervals (tail sortedIntervals)
   where sortedIntervals = music^.intervals.to sort
 
-noteFromInterval :: (HasRoot (f a) a, HasIntervals (f a), Transpose a) => f a -> Interval -> Maybe a
+noteFromInterval :: (HasRoot (f a) a, HasIntervals (f a), Transpose a)
+                 => f a
+                 -> Interval
+                 -> Maybe a
 noteFromInterval fa i =
   guard (anyOf (intervals.traverse) (i==) fa)
     $> shift i (fa^.root)
 
-intervalFromNote :: (HasRoot s a, HasIntervals s, Semitones a, Transpose a) => s -> a -> Maybe Interval
-intervalFromNote fa a = findOf (intervals.traverse) (\i -> steps (shift i (fa^.root)) == steps a) fa
+intervalFromNote :: (HasRoot s a, HasIntervals s, Semitones a, Transpose a)
+                 => s
+                 -> a
+                 -> Maybe Interval
+intervalFromNote fa a =
+  findOf (intervals.traverse) (\i -> steps (shift i (fa^.root)) == steps a) fa
 
 note :: (HasRoot (f a) a, HasIntervals (f a), Transpose a)
-     => Traversal' (f a) Interval -> Fold (f a) a
+     => Traversal' (f a) Interval
+     -> Fold (f a) a
 note l = to getNotes . traverse . id--_a -- . traverse
   where
     getNotes fa = do

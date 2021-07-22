@@ -48,7 +48,7 @@ instance Functor NoteBase where
 
 instance Semitones a => Semitones (NoteBase a) where
   steps nb = sum $
-    [nb^.noteName.to steps, nb^.accidental.to steps, nb^.noteOctave.to steps]
+    [nb^.noteName.to steps, nb^.accidental.to steps, nb^.noteOctave.to steps * 12]
 
 instance Transpose PitchClass where
   shift n p = pitchClass $ steps p + fromIntegral n
@@ -58,17 +58,18 @@ instance Transpose Pitch where
 instance HasAccidental (NoteBase a) where
   accidental = noteAccidental
 
+mkPitchClass :: NoteName -> Accidental -> PitchClass
+mkPitchClass name acc = NoteBase name acc ()
+
+mkPitch :: NoteName -> Accidental -> Int -> Pitch
+mkPitch = NoteBase
+
 c, d, e, f, g, a, b :: PitchClass
 [c, d, e, f, g, a, b] = (\p -> NoteBase p Natural ()) <$> [C, D, E, F, G, A, B]
   
-(#) :: NoteBase a -> NoteBase a
-(#) = set accidental Sharp
-(♭) :: NoteBase a -> NoteBase a
-(♭) = set accidental Flat
-
 allPitchClasses :: [PitchClass]
 allPitchClasses = nub . sort $
-  [c, d, e, f, g, a, b] >>= (\n -> [(n#), n, (n♭)])
+  [c, d, e, f, g, a, b] >>= (\n -> [(flat n), n, (sharp n)])
 
 pitchClass :: Int -> PitchClass
 pitchClass n = allPitchClasses !! mod12 n
@@ -76,5 +77,5 @@ pitchClass n = allPitchClasses !! mod12 n
 pitch :: Int -> Pitch
 pitch n = set noteOctave (div12 n) (pitchClass n)
 
-(%) :: NoteBase a -> b -> NoteBase b
+(%) :: NoteBase a -> Int -> Pitch
 (%) p x = set noteOctave x p

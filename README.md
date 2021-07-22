@@ -45,3 +45,11 @@
 - **`exts`**
 - **`bass`**
 - **`accidental`**
+
+# ------------
+
+```
+flat, natural, sharp :: Pitch -> Pitch
+:: PitchClass -> PitchClass
+:: 
+```
