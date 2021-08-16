@@ -1,0 +1,83 @@
+#+TITLE: Musical Context
+
+* How do we encode musical context around an object?
+Using the state monad to encode state is the obvious choice
+Want to be able to compose musical objects with the same context
+    This is state monad
+    How do we compose objects with different musical contexts?
+        rose tree of some sort???
+    What sort of context should be encoded?
+        General structure that allows any kind of context?
+
+** There is a difference between "needs" information and "has" information
+** Why do we need to store this context?
+to figure out the key of a piece of music
+
+#+begin_src haskell
+import Data.Has
+
+type MusicalCtx r a = (r, a)
+data KeySignature = KeySignature
+data Tempo = Tempo
+data Duration = Duration
+data TimeSignature = TimeSignature
+
+type instance TypeOf KeySignature = Key
+type instance TypeOf Tempo = Int
+type instance TypeOf Duration = Rational
+type instance TypeOf TimeSignature = Rational
+
+class Enharmonic t where
+    spell :: (Has Key r) => Key -> t -> MusicalCtx r t
+
+spellAll :: (Has Key r, Enharmonic t) => Key -> [t] -> MusicalCtx r [t]
+spellAll key = traverse (spell key)
+
+#+end_src
+
+** Link between Enharmonic spelling and musical context
+a proper enharmonic spelling requires musical ctx
+
+*** should we provide a default key context?
+*** What key context does a single note give us?
+Different notes provide different amounts of key context
+
+#+begin_src
+C - No information
+Bb - Key contains at least 1 flat
+Eb - Key contains at least 2 flats
+...
+F# - Key contains at least 1 sharp
+C# - Key contains at least 2 sharps
+G# - Key contains at least 3 sharps
+...
+#+end_src
+
+*** How should key context be encoded?
+#+begin_src haskell
+data KeyInformation
+  = NoInformation
+  | AtLeastNSharps Int
+  | AtLeastNFlats Int
+  | ExactlyNFlats Int
+  | ExactlyNSharps Int
+  | Invalid
+
+instance Semigroup KeyInformation where
+  NoInformation <> k = k
+  k <> NoInformation = k
+  AtLeastNFlats m <> AtLeastNFlats n = AtLeastNFlats (max m n)
+  AtLeastNSharps m <> AtLeastNSharps n = AtLeastNSharps (max m n)
+  ...
+
+instance Monoid KeyInformation where
+  mempty = NoInformation
+
+f :: KeyInformation -> Maybe Key
+g :: Key -> KeyInformation
+#+end_src
+
+*** Can a key uniquely determine the enharmonic spelling of a note/scale/etc?
+
+*** How do we combine key contexts?
+We need to do this when

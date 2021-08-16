@@ -1,0 +1,19 @@
+#+TITLE: Chords
+
+* How do we interpret chords?
+Given a chord, how do we interpret/name it for a user
+Each note provides a certain amount of context
+Musical intuition provides a certain amount of context
+need some sort of metric for simplicity
+#+begin_src haskell
+newChord :: [Ctx r a] -> Ctx (Chord a)
+#+end_src
+
+** Is the chord an inversion? does it have a bass note?
+
+
+* Method for naming chords
+1. Figure out the most likely key
+2. Accumulate musical context
+   a. get context from notes;
+   b. get context from intuition about chords

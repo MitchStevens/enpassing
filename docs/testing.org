@@ -1,0 +1,27 @@
+#+TITLE: Testing
+
+** Property tests
+Associativity: ~forall a b c. (a * b) * c = a * (b * c)~
+Commutativity: ~forall a b. a * b = b * a~
+
+Reflexivity: ~forall a. aRa~
+Symmetry: ~forall a b. aRb = bRa~
+Transitivity: ~forall a b c. aRb && bRc ==> aRc~
+
+Invertability: ~forall a. a * a^-1 = e~
+Identity: ~exists e. forall a. e * a = a * e = a~
+
+** Algebraic structure
+*** Group (e, *, ^-1)
+Invertable
+Identity
+Associativity
+
+** Class Laws Tests
+*** Semitones t
+The relation ~s~t <=> mod12 (steps s) = mod12 (steps t)~
+*** Transpose t
+~steps~ should be a surjective function
+~t~ should contain at least one element
+The kernel of ~steps~ should not be empty
+    (that is, the set ~{ x | forall x. steps x == 0 }~ should contain at least one element)

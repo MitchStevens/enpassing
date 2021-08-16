@@ -1,0 +1,16 @@
+#+TITLE: Module Dependencies
+
+#+begin_src
+
+             ,-- Note
+             |    |
+             |    V
+Accidental --|-> Key -----------> Ctx -->
+    |        |                   |
+    |        V                   V
+    `----> Pitch       MusicalBase --> Chords
+                            |
+                            V
+                           Scale
+
+#+end_src

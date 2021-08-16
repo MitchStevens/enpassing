@@ -1,0 +1,21 @@
+interface Semitones[A] {
+    Int steps();
+}
+
+interface Transpose[A] extends Semitones[A] {
+    A shift(Int n);
+    ne
+}
+
+steps is homomorphic over (+):
+(a+b).steps()
+a.shift(b.steps()).steps()  \\ let
+a.shift(n).steps()
+a.steps() + n
+
+steps is a surjection && steps is a homomorphism ==> transposition property:
+a.shift(n).steps()
+a.shift(b.steps()).steps()      // assume there is an element b such that b.steps() = n
+(a + b).steps()                 // by definition of (+)
+a.steps() + b.steps()           // since steps is a homomorphism
+a.steps() + n                   // by (2.)
