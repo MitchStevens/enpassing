@@ -9,7 +9,7 @@ class Semitones t where
 
 This instance also defines a relation
 #+begin_src
-s ~ t <=> steps s = mod12 (steps t)
+s ~ t <=> mod12 (steps s) = mod12 (steps t)
 
 reflexive y
 symmetric y
@@ -22,41 +22,52 @@ steps s = mod12 (steps t)
 thus s ~ u
 #+end_src
 
+~steps~ should also define a partial ordering
+
+#+begin_src haskell
+compare a b
+  | a == b = Just EQ
+  | a < b  = Just LT
+  | a > b  = Just GT
+  | otherwise = Nothing
+#+end_src
+
 * Transposable Objects
 A transposable object is a type with an instance of ~Transpose~.
 #+begin_src haskell
-class Transpose t where
-  shift :: Integral n => n -> t -> t
+transpose :: Transpose t => Int -> t -> t
 #+end_src
 
-We can define a group operations (identity, addition, inverse) for any Semitone and Transposable object.
+We can define a group operations (identity, addition, inverse) for any Semitone and Transposable object if we have a valid identity element.
 #+begin_src
-0 = t - t
-s + t = shift (steps t) s
-- s = shift (- steps s) 0
+s + t = transpose (steps t) s
+- s = transpose (- steps s) 0
 #+end_src
 
 For this object to be a group, we need to prove:
 #+begin_src
+0 element exists            identity
 (s+t)+u = s+(t+u)           associativity
 a+(-a) = (-a)+a = 0         inverse
 #+end_src
 
-The set of functions ~{shift n | n in Z}~ should also form a group
+The set of functions ~{transpose n | n in Z}~ should also form a group
 #+begin_src
-0 = shift 0
-shift m + shift n = shift (m+n)
-- shift n = shift (-n)
+0 = transpose 0
+transpose m + transpose n = transpose (m+n)
+- transpose n = transpose (-n)
 #+end_src
 
 * Transposition Property
-We need to relate the ~Semitones~ and ~Transpose~ classes. This is called the *strong transposition property*:
-~steps (shift n t) = steps t + n~
+We need to relate the ~Semitones~ and ~Transpose~ classes. This is called the *transposition property*:
+~steps (transpose n t) = steps t + n~.
 
-The *strong transposition property* holds whenever ~steps~ is surjective. Proof:
-#+begin_src
-steps (shift n t)
-    = steps (shift (steps n') t) -- let n' be an value such that
+The *transposition property* holds whenever ~steps~ is surjective. Proof:
+#+begin_src haskell
+    = steps (transpose n t)
+    = steps (transpose (steps s) t) -- steps is surjective,
+
+-- let n' be an value such that
                                  -- steps n' = n
     = steps (t + n')
     = steps t + steps n'
@@ -75,17 +86,11 @@ shift A4 C = F#
 shift D5 C = Gb
 #+end_src
 
-So what we really want is a function
+So lets define transpose in terms of another function
 #+begin_src haskell
 class Transpose t where
   shift :: Interval -> t -> t
 
 transpose :: Transpose t => Int -> t -> t
 transpose = shift . stepsToInterval
-
-shift :: Int -> t -> t
 #+end_src
-
-* Problems
-- No Diatonic Transposition
-  - Who cares! Nobody uses it

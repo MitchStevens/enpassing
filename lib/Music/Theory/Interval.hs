@@ -1,8 +1,6 @@
-{-# LANGUAGE RankNTypes, PatternSynonyms #-}
 module Music.Theory.Interval (
-  Interval (..),
-  stepsToInterval,
-  triad
+  Interval (..), intervalDegree, intervalQuality,
+  stepsToInterval
 ) where
 
 import Control.Lens
@@ -13,8 +11,6 @@ import Data.String
 import Music.Theory.Degree
 import Music.Theory.Semitones
 import Music.Theory.Accidental
-import  Music.Theory.Quality (ChordQuality)
-import qualified Music.Theory.Quality as Q
 
 data IntervalQuality = Major | Minor | Diminished | Augmented deriving Show
 pattern Perfect = Major
@@ -23,22 +19,6 @@ data Interval = Interval
   { _intervalQuality :: IntervalQuality
   , _intervalDegree :: Degree }
 makeLenses ''Interval
-
--- is there any reason I can't alias all the intervals like this?
--- are 'I', 'V', or 'X' used by something else?
-pattern I    = Interval Major 0
-pattern II   = Interval Major 1
-pattern III  = Interval Major 2
-pattern IV   = Interval Major 3
-pattern V    = Interval Major 4
-pattern VI   = Interval Major 5
-pattern VII  = Interval Major 6
-pattern VIII = Interval Major 7
-pattern IX   = Interval Major 8
-pattern X    = Interval Major 9
-pattern XI   = Interval Major 10
-pattern XII  = Interval Major 11
-pattern XIII = Interval Major 12
 
 instance Eq Interval where
   (==) = (==) `on` steps
@@ -142,11 +122,3 @@ stepsToInterval n = Interval quality degree'
     octaves = div12 n
     degree' = Degree (7 * octaves + d) 
 
-triad :: ChordQuality -> [Interval]
-triad = \case
-  Q.Major      -> ["P1", "m3", "P5"]
-  Q.Minor      -> ["P1", "M3", "P5"]
-  Q.Diminished -> ["P1", "m3", "d5"]
-  Q.Augmented  -> ["P1", "M3", "A5"]
-  Q.Sus2       -> ["P1", "M2", "P5"]
-  Q.Sus4       -> ["P1", "P4", "P5"]

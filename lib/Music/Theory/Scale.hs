@@ -48,13 +48,13 @@ scale root intervals = mode intervals $> root
 
 ionian, dorian, phrygian, lydian, mixolydian, aeolian, locrian :: Mode
 ionian     = mode ["P1", "M2", "M3", "P4", "P5", "M6", "M7"]
-dorian     = aeolian & degree VI  %~ flatten
-phrygian   = aeolian & degree II  %~ flatten
-lydian     = ionian  & degree IV  %~ flatten
-mixolydian = ionian  & degree VII %~ flatten
+dorian     = aeolian & degree VI  %~ flat
+phrygian   = aeolian & degree II  %~ flat
+lydian     = ionian  & degree IV  %~ flat
+mixolydian = ionian  & degree VII %~ flat
 aeolian    = mode ["P1", "M2", "m3", "P4", "P5", "m6", "m7"]
-locrian    = aeolian & degree II  %~ flatten
-                     & degree V   %~ flatten
+locrian    = aeolian & degree II  %~ flat
+                     & degree V   %~ flat
 
 diminished, augmented :: Mode
 diminished = mode [2, 1, 2, 1, 2, 1, 2, 1]

@@ -11,7 +11,6 @@ import Music.Theory.Degree
 import Music.Theory.Interval
 import Music.Theory.MusicalBase
 import Music.Theory.Pitch
-import Music.Theory.Quality
 import Music.Theory.Scale
 import Music.Theory.Semitones
 import Music.Theory.Transpose
@@ -26,15 +25,33 @@ type Chord a = MusicalBase Chord' a
   Chord Pitch       = chords: C5+E5+G5+B5+D6
 -}
 
+data ChordQuality
+  = Diminished
+  | Minor
+  | Major
+  | Augmented
+  | Sus2
+  | Sus4
+
+instance Show ChordQuality where
+  show = \case
+    Minor      -> "m"
+    Major      -> "maj"
+    Augmented  -> "aug"
+    Diminished -> "dim"
+    Sus2       -> "sus2"
+    Sus4       -> "sus4"
+    _          -> error "Mode Parse Error"
+
 -- TODO: create show instances for chords
-instance Show (Chord a) where
-  show _ = ""
+instance Show a => Show (Chord a) where
+  show (MusicalBase base offsets) = show base <> " " <> show offsets
 
 newChord :: a -> [Interval] -> Chord a
 newChord = MusicalBase
 
-exts :: Chord a -> [Interval]
-exts = view $ intervals . to (filter (> "P5"))
+exts :: HasIntervals a => Traversal' a Interval
+exts = intervals . traverse . filtered (> "P5")
 
 --- Show Chords
 --instance Show Chord where
@@ -56,9 +73,16 @@ chord root qual exts = newChord root (triad qual <> exts)
 bass :: HasIntervals t => Traversal' t Interval
 bass = intervals . traverse . filtered (< 0)
 
+triad :: ChordQuality -> [Interval]
+triad = \case
+  Major      -> ["P1", "M3", "P5"]
+  Minor      -> ["P1", "m3", "P5"]
+  Diminished -> ["P1", "m3", "d5"]
+  Augmented  -> ["P1", "M3", "A5"]
+  Sus2       -> ["P1", "M2", "P5"]
+  Sus4       -> ["P1", "P4", "P5"]
+
 data Inversion chord a = Inversion
   { _inversionNum :: Int
   , _inversionChord :: chord a }
 makeLenses ''Inversion
-
----

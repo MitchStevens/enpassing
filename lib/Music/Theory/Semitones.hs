@@ -20,3 +20,6 @@ instance Semitones Int where
 -}
 diff :: Semitones t => t -> t -> Int
 x `diff` y = steps x - steps y
+
+numOctaves :: (Semitones a) => a -> Int
+numOctaves = (`div` 12) . steps

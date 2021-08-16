@@ -1,5 +1,6 @@
 module Test.Music.Theory.Transpose
   ( tests
+  , specSemitones
   , specStrongTransposition
   , specWeakTransposition
 ) where
@@ -18,17 +19,35 @@ import Control.Lens hiding (below)
 import Control.Lens.Properties as Properties
 
 import Music.Theory
+import Test.Function
 
 tests :: Spec
 tests = describe "Transpose" $ do 
   specWeakTransposition @Int
   specStrongTransposition @Int
 
+
+specSemitones :: forall t.
+  ( Eq t
+  , Show t
+  , Arbitrary t
+  , Semitones t )
+  => Spec
+specSemitones = specRelation @t (\a b -> mod12 (steps a) == mod12 (steps b))
+
+--specTransposition :: forall t.
+--  ( Semitones t
+--  , Transpose t )
+--  => Spec
+--specTransposition zero =
+--  prop "" $
+--    prop_Group zero (\a b -> transpose (steps b) a)
+
+
 specWeakTransposition :: forall t.
   ( Eq t
   , Show t
   , Typeable t
-  , Validity t
   , Arbitrary t
   , Semitones t
   , Transpose t) 
@@ -43,16 +62,15 @@ specWeakTransposition = describe ("Weak transposition property of " <> ty) $ do
 
     propWeakShiftSimplify :: Int -> t -> Property
     propWeakShiftSimplify n t = 
-      steps (shift n t) `octaveEq'` (steps t + n)
+      steps (transpose n t) `octaveEq'` (steps t + n)
 
     propWeakShiftCommute :: Int -> Int -> t -> Property
     propWeakShiftCommute m n t = 
-      shift n (shift m t) `octaveEq'` shift (m+n) t
+      transpose n (transpose m t) `octaveEq'` transpose (m+n) t
 
 specStrongTransposition :: forall t.
   ( Eq t
   , Show t
-  , Validity t
   , Arbitrary t
   , Semitones t
   , Transpose t) 
@@ -68,11 +86,11 @@ specStrongTransposition = describe "class Transpose" $ do
   where
     propStrongShiftSimplify :: Int -> t -> Property
     propStrongShiftSimplify n t = 
-      steps (shift n t) === (steps t + n)
+      steps (transpose n t) === (steps t + n)
 
     propStrongShiftCommute :: Int -> Int -> t -> Property
     propStrongShiftCommute m n t = 
-      shift n (shift m t) === shift (m+n) t
+      transpose n (transpose m t) === transpose (m+n) t
 
 specShift0NoOperation :: forall t.
   ( Eq t
@@ -89,7 +107,6 @@ specShift0NoOperation =
 specOctaveLens :: forall t. 
   ( Eq t
   , Show t
-  , Validity t
   , Arbitrary t
   , Semitones t
   , Transpose t) 

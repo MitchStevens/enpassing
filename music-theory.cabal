@@ -46,6 +46,7 @@ common lib
                       Music.Theory.Degree
                       Music.Theory.Interval
                       Music.Theory.MusicalBase
+                      Music.Theory.Note
                       Music.Theory.Pitch
                       Music.Theory.Quality
                       Music.Theory.Scale
@@ -59,6 +60,13 @@ library
   other-modules:
   hs-source-dirs:     lib
 
+executable guitar-chord
+  import: lib
+  other-modules:      Hand
+                      GuitarChord 
+  hs-source-dirs:     lib, examples/guitar-chord-fingering
+  main-is:            GuitarChord.hs
+
 test-suite test
   import: lib
   type:               exitcode-stdio-1.0
@@ -67,7 +75,11 @@ test-suite test
                       hspec,
                       validity,
                       genvalidity,
-                      genvalidity-hspec-optics
+                      genvalidity-hspec-optics,
+                      lens-properties
   other-modules:      Music.Parsers
                       Test.Comparators
+                      Test.Function
+                      Test.Music.Theory.Degree
+                      Test.Music.Theory.Transpose
   hs-source-dirs:     lib, test

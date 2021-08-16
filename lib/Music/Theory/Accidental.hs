@@ -9,10 +9,10 @@
 -}
 
 module Music.Theory.Accidental (
-  Accidental (..),
+  Accidental (..), offset,
   HasAccidental, accidental,
   pattern DoubleFlat, pattern Flat, pattern Natural, pattern Sharp, pattern DoubleSharp,
-  flatten, sharpen,
+  flat, sharp,
 ) where
 
 import Music.Theory.Semitones
@@ -23,6 +23,15 @@ newtype Accidental = Offset Int
   deriving (Eq, Ord, Num)
     via Int
 
+offset :: Int -> Accidental
+offset n = case mod12 n of
+  0  -> Natural
+  1  -> Sharp
+  2  -> DoubleSharp
+  10 -> DoubleFlat
+  11 -> Flat
+  a  -> Offset a
+
 pattern DoubleFlat  = Offset (-2) :: Accidental
 pattern Flat        = Offset (-1) :: Accidental
 pattern Natural     = Offset (0)  :: Accidental
@@ -31,11 +40,11 @@ pattern DoubleSharp = Offset (2)  :: Accidental
 
 instance Show Accidental where
   show = \case
-    DoubleFlat  -> "𝄫"
-    Flat        -> "♭"
+    DoubleFlat  -> "bb"
+    Flat        -> "b"
     Natural     -> ""
-    Sharp       -> "♯"
-    DoubleSharp ->  "𝄪"
+    Sharp       -> "#"
+    DoubleSharp ->  "##"
     Offset n    -> "offset" <> show n
 
 class HasAccidental s where
@@ -44,11 +53,12 @@ class HasAccidental s where
 instance Semitones Accidental where
   steps (Offset n) = n
 
-flatten :: (HasAccidental t) => t -> t
-flatten = accidental %~ (+ Flat)
+flat :: (HasAccidental t) => t -> t
+flat = accidental %~ (+ Flat)
 
-sharpen :: (HasAccidental t) => t -> t
-sharpen = accidental %~ (+ Sharp)
+sharp :: (HasAccidental t) => t -> t
+sharp = accidental %~ (+ Sharp)
 
-class Enharmonic s where
-  spell :: Accidental -> s -> s
+-- TODO:
+--class Enharmonic s where
+--  spell :: Accidental -> s -> s

@@ -5,17 +5,6 @@ Could also represent scale progressions
     good for
 ~data Progression a~
 
-* How do we encode musical context around an object?
-Using the state monad to encode state is the obvious choice
-Want to be able to compose musical objects with the same context
-    This is state monad
-    How do we compose objects with different musical contexts?
-        rose tree of some sort???
-    What sort of context should be encoded?
-        General structure that allows any kind of context?
-
-** Why do we need to store this context?
-to figure out the key of a piece of music
 
 * Problems
 ** Cyclic deps

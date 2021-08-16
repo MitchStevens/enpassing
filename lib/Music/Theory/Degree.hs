@@ -35,15 +35,6 @@ pattern XIII = Degree 12
 instance Show Degree where
   show (Degree n) = toRoman (n+1)
 
-instance Num Degree where
-  (+) = undefined
-  (-) = undefined
-  (*) = undefined
-  negate        = undefined
-  abs = undefined
-  signum   = undefined
-  fromInteger   = mkDegree . fromIntegral
-
 instance Enum Degree where
   toEnum = mkDegree
   fromEnum = unDegree
@@ -52,14 +43,14 @@ instance Semitones Degree where
   steps (Degree n) = 12*octaves + semitones
     where
       octaves = n `div` 7
-      semitones = case n `mod` 7 of
-        0 -> 0
-        1 -> 2
-        2 -> 4
-        3 -> 5
-        4 -> 7
-        5 -> 9
-        6 -> 11
+      semitones = case Degree (n `mod` 7) of
+        I   -> 0
+        II  -> 2
+        III -> 4
+        IV  -> 5
+        V   -> 7
+        VI  -> 9
+        VII -> 11
 
 toRoman :: Int -> String
 toRoman x
@@ -93,18 +84,5 @@ toRoman x
 allDegrees :: [Degree]
 allDegrees = mkDegree <$> [1..]
 
-{-
-alpha :: Degree -> List Interval
-alpha (Degree n) = case n of
-  0 -> [ natural i ]
-  1 -> [ natural ii, flat ii, ]
-  2 -> []
-  3 -> []
-  4 -> []
-  5 -> []
-  6 -> []
-  _ -> []
-  -}
-
 isPerfect :: Degree -> Bool
-isPerfect = (`elem` [0, 3, 4]) . (`mod` 7) . unDegree
+isPerfect (Degree n) = (n `mod` 7) `elem` [0, 3, 4]

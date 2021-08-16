@@ -2,21 +2,25 @@ module Test.Music.Theory.Degree (
   tests
 ) where
 
-import Data.GenValidity
+--import Data.GenValidity
 import Test.QuickCheck
 import Test.Hspec
 import Test.QuickCheck.Gen
 
-import Music.Theory.Degree
+import Music.Theory
+import Test.Music.Theory.Transpose hiding (tests)
 
 tests :: Spec
-tests = pure ()
+tests = specSemitones @Degree
 
-instance Validity Degree where
-  validate d = check (I <= d && d <= XIII) "degree not in range"
+--instance Validity Degree where
+--  validate d = check (I <= d && d <= XIII) "degree not in range"
 
 instance Arbitrary Degree where 
-  arbitrary = Degree <$> choose (0, 13)
+  arbitrary = elements [I .. XIII]
+
+
+-- mkDegree . unDegree = id
 
 --hunitTests :: IO ()
 --hunitTests = void . runTestTT . TestLabel "Degree" $ TestList

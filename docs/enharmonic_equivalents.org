@@ -4,3 +4,22 @@
 Notes, Chords, Scales, Intervals can all have different spellings
 ~shift~ should preserve enharmonic spelling
     Intervaa
+
+** Enharmonically equivalent notes
+Using only the three main accidentals (flat, natural, sharp),
+
+#+begin_src
+-  C# -  D# -  E# F# -  G# -  A# -  B#
+C  -  D  -  E  F  -  G  -  A  -  B  -
+-  Db    Eb Fb -  Gb -  Ab -  Bb -  Cb
+#+end_src
+
+** Improve spelling
+We want to be able to prefer certain spellings of enharmonically equivalent notes.
+*** How do we choose
+We provide a particular key
+
+#+begin_src haskell
+class Enharmonic t where
+    spell :: t -> Keyed t
+#+end_src
