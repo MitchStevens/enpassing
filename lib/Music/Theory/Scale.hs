@@ -57,8 +57,10 @@ locrian    = aeolian & degree II  %~ flat
                      & degree V   %~ flat
 
 diminished, augmented :: Mode
-diminished = mode [2, 1, 2, 1, 2, 1, 2, 1]
-augmented  = mode [3, 1, 3, 1, 3, 1]
+diminished = mode
+  [ "M2", "m2", "M2", "m2", "M2", "m2", "M2", "m2"]
+augmented  = mode
+  ["m3", "m2", "m3", "m2", "m3", "m2"]
 
 {-
   What gives a scale/chord its quality?

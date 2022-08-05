@@ -1,59 +1,106 @@
--- |
-
 module Test.Function where
 
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-specInverse :: forall a.
-  ( Eq a
-  , Show a
-  , Arbitrary a )
-  => (a -> a) -> Spec
-specInverse f = prop "" $ \x -> f (f x) === x
+specInverse ::
+  forall a b.
+  ( Eq a,
+    Eq b,
+    Show a,
+    Show b,
+    Arbitrary a,
+    Arbitrary b
+  ) =>
+  (a -> b) ->
+  (b -> a) ->
+  Spec
+specInverse f g =
+  prop "Inverse" $
+    (\x -> f (g x) === x) .&&. (\y -> g (f y) === y)
 
-specAssociativity :: forall a.
-  ( Eq a
-  , Show a
-  , Arbitrary a )
-  => (a -> a -> a) -> Spec
+specIdempotent ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a) ->
+  Spec
+specIdempotent f = prop "Idempotent" $
+  \x -> f x === f (f x)
+
+specInvolution ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a) ->
+  Spec
+specInvolution f = prop "" $ \x -> f (f x) === x
+
+specAssociativity ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a -> a) ->
+  Spec
 specAssociativity f =
   prop "" $ \x y z -> f x (f y z) == f (f x y) z
 
-specCommutative :: forall a b.
-  ( Eq b
-  , Show a, Show b
-  , Arbitrary a )
-  => (a -> a -> b) -> Spec
+specCommutative ::
+  forall a b.
+  ( Eq b,
+    Show a,
+    Show b,
+    Arbitrary a
+  ) =>
+  (a -> a -> b) ->
+  Spec
 specCommutative f = prop "" $ \x y -> f x y === f y x
 
-specReflexivity :: forall a.
-  ( Eq a
-  , Show a
-  , Arbitrary a )
-  => (a -> a -> Bool) -> Spec
+-- relations
+specReflexivity ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a -> Bool) ->
+  Spec
 specReflexivity f = prop "reflexivity" $ \x -> f x x === True
 
-specSymmetry :: forall a.
-  ( Eq a
-  , Show a
-  , Arbitrary a )
-  => (a -> a -> Bool) -> Spec
+specSymmetry ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a -> Bool) ->
+  Spec
 specSymmetry f = prop "symmetry" $ \x y -> f x y === f y x
 
-specTransitivity :: forall a.
-  ( Eq a
-  , Show a
-  , Arbitrary a )
-  => (a -> a -> Bool) -> Spec
+specTransitivity ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a -> Bool) ->
+  Spec
 specTransitivity f = prop "transitivity" $ \x y z -> if f x y && f y z then f x z else True
 
-
-specRelation :: forall a.
-  ( Eq a
-  , Show a
-  , Arbitrary a )
-  => (a -> a -> Bool) -> Spec
+specRelation ::
+  forall a.
+  ( Eq a,
+    Show a,
+    Arbitrary a
+  ) =>
+  (a -> a -> Bool) ->
+  Spec
 specRelation f =
-  specReflexivity f  *> specSymmetry f *> specTransitivity f
+  specReflexivity f *> specSymmetry f *> specTransitivity f

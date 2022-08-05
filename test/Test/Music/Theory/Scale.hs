@@ -1,25 +1,22 @@
 module Test.Music.Theory.Scale where
 
-import Test.QuickCheck
-
 import Music.Theory
+import Test.QuickCheck
 
 instance Arbitrary Mode where
   arbitrary = newMode <$> traverse genInterval [I .. VII]
     where
       genInterval :: Degree -> Gen Interval
-      genInterval deg = frequency
-        [ (100, pure (newInterval Major deg))
-        , (100, pure (newInterval Minor deg))
-        , (10,  pure (newInterval Augmented deg))
-        , (10,  pure (newInterval Diminished deg))
-        ]
+      genInterval deg =
+        frequency
+          [ (100, pure (Interval Major deg)),
+            (100, pure (Interval Minor deg)),
+            (10, pure (Interval Augmented deg)),
+            (10, pure (Interval Diminished deg))
+          ]
 
 instance Arbitrary Scale where
   arbitrary = newScale <$> arbitrary <*> arbitrary
-
- wh
-
 
 {- test scale like (Mode, Scale)
 - test interval lens

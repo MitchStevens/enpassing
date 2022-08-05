@@ -1,103 +1,172 @@
-{-# LANGUAGE PostfixOperators #-}
 module Music.Theory.Pitch where
 
 import Control.Lens hiding ((#))
-import Data.Function           (on)
-import Data.List (nub, sort)
-import Data.Ord                (comparing)
 import Data.Foldable
+import Data.Function (on)
+import Data.Functor (($>))
+import Data.List (nub, sort)
+import Data.Maybe (fromMaybe)
+import Data.Ord (comparing)
 import Debug.Trace
-
+import GHC.Generics hiding (to)
 import Music.Theory.Accidental
+import Music.Theory.Classes
 import Music.Theory.Degree
 import Music.Theory.Interval
-import Music.Theory.Semitones
 import Music.Theory.Note
+import Music.Theory.Semitones
 import Music.Theory.Transpose
 
-data NoteBase a = NoteBase
-  { _noteName :: NoteName
-  , _noteAccidental :: Accidental
-  , _noteOctave :: a }
-makeLenses ''NoteBase
+type PitchLike p o = (HasAccidental p, HasPitchName p, HasOctave p o, Semitones p)
+
+pitchClass :: (PitchLike p o) => Lens' p PitchClass
+pitchClass = lens getPC setPC
+  where
+    getPC p = PitchClass (p ^. pitchName) (p ^. accidental)
+    setPC p (PitchClass name acc) = set pitchName name . set accidental acc $ p
 
 -- notes without octave
-type PitchClass = NoteBase ()
--- notes with octave
-type Pitch      = NoteBase Int
+data NoOctave = NoOctave deriving (Show, Generic)
 
--- PitchClass: A Note with an accidental
-instance Semitones a => Eq (NoteBase a) where
-  (==) = (==) `on` steps
+data PitchClass = PitchClass
+  { _pcName :: NoteName,
+    _pcAccidental :: Accidental
+  }
+  deriving (Eq, Generic)
+
+data Pitch = Pitch
+  { _pPitchClass :: PitchClass,
+    _pOctave :: Int
+  }
+  deriving (Eq, Generic)
+
+makeLenses ''Pitch
+
+makeLenses ''PitchClass
+
+instance HasAccidental PitchClass where
+  accidental = pcAccidental
+
+instance HasPitchName PitchClass where
+  pitchName = pcName
+
+instance HasOctave PitchClass () where
+  pitchOctave f p = f () $> p
+
+instance HasAccidental Pitch where
+  accidental = pPitchClass . accidental
+
+instance HasPitchName Pitch where
+  pitchName = pPitchClass . pitchName
+
+instance HasOctave Pitch Int where
+  pitchOctave = pOctave
+
+-- NoOctave instances
+--instance Enum PitchCalss where
+--  toEnum _ = NoOctave
+--  fromEnum _ = 0
+
+--instance (Semitones p, PitchLike p o) => Eq p where
+--  (==) = (==) `on` steps
 
 instance Show PitchClass where
-  show (NoteBase noteName noteAccidental ()) =
-    show noteName <> show noteAccidental
+  show (PitchClass name acc) =
+    show name <> show acc
+
 instance Show Pitch where
-  show (NoteBase noteName noteAccidental noteOctave) =
-    show noteName <> show noteAccidental <> show noteOctave
+  show (Pitch (PitchClass name acc) octave) =
+    show name <> show acc <> show octave
 
-instance Semitones a => Ord (NoteBase a) where
-  compare = compare `on` steps
+--instance (Semitones p, PitchLike p o) => Ord p where
+--  compare = compare `on` steps
 
-instance Functor NoteBase where
-  fmap = over noteOctave
+instance Semitones PitchClass where
+  steps p =
+    sum
+      [ p ^. pitchName . to (steps :: NoteName -> Int),
+        p ^. accidental . to (steps :: Accidental -> Int)
+      ]
 
-instance Semitones a => Semitones (NoteBase a) where
-  steps nb = sum
-    [nb^.noteName.to steps, nb^.accidental.to steps, nb^.noteOctave.to steps * 12]
+instance Semitones Pitch where
+  steps p =
+    sum
+      [ p ^. pitchName . to (steps :: NoteName -> Int),
+        p ^. accidental . to (steps :: Accidental -> Int),
+        p ^. pitchOctave . to fromEnum * 12
+      ]
+
+instance Transpose PitchClass where
+  -- shift :: Interval -> p -> p
+  shift interval@(Interval acc (Degree n)) oldPitch = newPitch
+    where
+      newPitch =
+        oldPitch
+          & pitchName .~ newName
+          & accidental .~ newAcc
+
+      oldName = oldPitch ^. pitchName
+      oldAcc = oldPitch ^. accidental
+      newName = toEnum ((fromEnum oldName + n) `mod` 7)
+      newAcc = offset (steps oldPitch + steps interval - steps newName)
+
+instance Transpose Pitch where
+  shift interval@(Interval acc (Degree n)) oldPitch = newPitch
+    where
+      newPitch =
+        oldPitch
+          & pitchName .~ newName
+          & pitchOctave .~ newOct
+          & accidental .~ newAcc
+
+      oldName = oldPitch ^. pitchName
+      oldOct = oldPitch ^. pitchOctave
+      oldAcc = oldPitch ^. accidental
+      newName = toEnum ((fromEnum oldName + n) `mod` 7)
+      newOct = toEnum (fromEnum oldOct + (fromEnum oldName - fromEnum newName + n) `div` 7)
+      newAcc = offset (steps oldPitch + steps interval - steps newName - 12 * fromEnum newOct)
 
 {-
-  How to shift by an interval:
-    1. shift notename up or down based on degree (note)
-    2. add accidentals to make
-    3. deal with the octave
+  the following hold:
+    newName = oldName + n `mod` 7
+    newOct = oldOct + (newName - oldName) `div` 7
+    newAcc = steps old - steps newName - 12 * steps newOct
 
-    name2 + acc2 = name1 + acc1 + interval
-    acc2 = offset (name1 + acc1 + interval - name2)
-    -- because offset takes accidental mod 12
-    acc2 = offset (steps note + steps interval - name2)
-
-    note2 + acc2 + oct2*12 = note1 + acc1 + oct1*12 + interval
-    oct2*12 = note1 + acc1 + oct1*12 + interval - note2 - acc2
-    oct2 = oct1 + div (note1 + acc1 + interval - note2 - acc2)
-
+  TODO: fix error message?
 -}
-instance (Enum a, Bounded a, Semitones a) => Transpose (NoteBase a) where
-  shift interval@(Interval _ (Degree n)) note@(NoteBase oldName oldAcc oldOctave) =
-    note
-      & noteName .~ newName
-      & noteAccidental .~ newAcc
-      & noteOctave .~ newOctave
-    where
-      note1 = steps oldName
-      note2 = steps newName
-      acc1 = steps oldAcc
-      acc2 = steps newAcc
 
-      newName = shiftWithOverflow n oldName
-      newAcc = offset (steps interval + note1 + acc1 - note2)
-      newOctave = shiftWithOverflow (div12 (steps interval + note1 + acc1 - note2 - acc2)) oldOctave
+instance Enharmonic PitchClass where
+  flatKey = fromMaybe (error "hallofdsaf") . find (not . isSharp) . iterate (enharmonicPitchClassShift (-1))
+  sharpKey = fromMaybe (error "hallofdsaf") . find (not . isFlat) . iterate (enharmonicPitchClassShift 1)
 
-shiftWithOverflow :: forall a. (Enum a, Bounded a) => Int -> a -> a
---shiftWithOverflow n a = trace ("&&& -> " <> show (fromEnum a + n) <> show cardinality) $ toEnum ((fromEnum a + n) `mod` cardinality)
-shiftWithOverflow n a = toEnum ((fromEnum a + n) `mod` cardinality)
+enharmonicPitchClassShift :: Int -> PitchClass -> PitchClass
+enharmonicPitchClassShift n old = new
   where
-    cardinality = 1 + fromEnum (maxBound @a) - fromEnum (minBound @a)
+    new =
+      old
+        & pitchName .~ newName
+        & accidental .~ newAcc
 
-instance HasAccidental (NoteBase a) where
-  accidental = noteAccidental
+    oldName = old ^. pitchName
+    oldAcc = old ^. accidental
+
+    newName = toEnum ((fromEnum oldName - n) `mod` 7)
+    newAcc = offset (steps old - steps newName)
+
+--instance (Show (NoteBase a), Enum a, Semitones a) => Enharmonic (NoteBase a) where
+--  flatKey = fromMaybe (error "hallofdsaf") . find (not . isSharp) . iterate (enharmonicShift (-1))
+--  sharpKey = fromMaybe (error "hallofdsaf") . find (not . isFlat) . iterate (enharmonicShift 1)
 
 newPitchClass :: NoteName -> Accidental -> PitchClass
-newPitchClass note acc = NoteBase note acc ()
+newPitchClass note acc = PitchClass note acc
 
 c, d, e, f, g, a, b :: PitchClass
-[c, d, e, f, g, a, b] = [ newPitchClass p Natural | p <- [C .. B] ]
-  
+[c, d, e, f, g, a, b] = [newPitchClass p Natural | p <- [C .. B]]
+
 allPitchClasses :: [PitchClass]
 allPitchClasses = do
   n <- [c, d, e, f, g, a, b]
   [flat n, n, sharp n]
 
-(%) :: NoteBase a -> Int -> Pitch
-(%) p x = set noteOctave x p
+(%) :: PitchLike p o => p -> Int -> Pitch
+(%) p = Pitch (PitchClass (p ^. pitchName) (p ^. accidental))

@@ -21,18 +21,19 @@ common lib
                       containers,
                       lens, 
                       mtl,
-                      text
+                      text,
+                      subcategories
   default-extensions: AllowAmbiguousTypes,
-                      --TypeFamilies,
                       OverloadedStrings,
+                      ConstraintKinds,
                       FunctionalDependencies,
                       DerivingVia,
-                      --UndecidableInstances,
-                      --FlexibleContexts,
+                      DeriveGeneric,
+                      FlexibleContexts,
+                      UndecidableInstances,
                       FlexibleInstances,
                       LambdaCase,
                       MultiParamTypeClasses,
-                      --NoMonomorphismRestriction,
                       PatternSynonyms,
                       RankNTypes,
                       ScopedTypeVariables,
@@ -41,6 +42,7 @@ common lib
   other-modules:      Music.Theory
                       Music.Theory.Accidental
                       Music.Theory.Chord
+                      Music.Theory.ChordNaming
                       Music.Theory.Classes
                       Music.Theory.Constructors
                       Music.Theory.Degree
@@ -60,26 +62,35 @@ library
   other-modules:
   hs-source-dirs:     lib
 
-executable guitar-chord
-  import: lib
-  other-modules:      Hand
-                      GuitarChord 
-  hs-source-dirs:     lib, examples/guitar-chord-fingering
-  main-is:            GuitarChord.hs
-
 test-suite test
   import: lib
   type:               exitcode-stdio-1.0
   main-is:            Test/Main.hs
   build-depends:      QuickCheck,
                       hspec,
-                      validity,
-                      genvalidity,
-                      genvalidity-hspec-optics,
                       lens-properties
   other-modules:      Music.Parsers
                       Test.Comparators
                       Test.Function
                       Test.Music.Theory.Degree
+                      Test.Music.Theory.Classes
+                      Test.Music.Theory.Chord
                       Test.Music.Theory.Transpose
+                      Test.Music.Theory.Pitch
+                      Test.Music.Theory.Accidental
+                      Test.Music.Theory.Interval
+                      Test.Music.Theory.Semitones
   hs-source-dirs:     lib, test
+
+executable demo-passing
+  import: lib
+  default-extensions: FlexibleContexts
+  hs-source-dirs:     lib, examples/passing
+  main-is:            Main.hs
+
+--executable guitar-chord
+--  import: lib
+--  other-modules:      Hand
+--                      GuitarChord
+--  hs-source-dirs:     lib, examples/guitar-chord-fingering
+--  main-is:            GuitarChord.hs

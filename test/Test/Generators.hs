@@ -56,19 +56,6 @@ genDegree :: Gen Degree
 genDegree = Degree <$> genAccidental <*>chooseInt 0 12
 
 
--- Pitch Class
-genPitchClass :: Gen PitchClass
-genPitchClass = elements (C :| [D, E, F, G, A, B])
-
--- Pitch
-genPitch :: Gen Pitch
-genPitch = pitchFromSteps <$> chooseInt 0 11
-
--- Note
-genNote :: Gen Note
-genNote = noteFromSteps <$> chooseInt 0 47
-
-
 -- Mode
 genMode :: Gen Mode
 genMode = Mode <$> genSumList 12
@@ -149,12 +136,6 @@ instance Arbitrary Degree where
   shrink = \case
     Degree 1 -> []
     _        -> [d1]
-
-instance Arbitrary a => Arbitrary (LetterCase a) where
-  arbitrary = elements [Upper, Lower] <*> arbitrary
-  shrink = \case
-    Upper x -> Lower x : (Upper <$> shrink x)
-    Lower x -> Lower <$> shrink x
 
 instance Arbitrary Mode where
   arbitrary = arbitraryBoundedEnum

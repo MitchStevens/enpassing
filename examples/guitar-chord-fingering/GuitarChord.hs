@@ -1,6 +1,6 @@
 -- | 
 
-module GuitarChord where
+module GuitarChord () where
 
 import Control.Lens
 import Data.Maybe (catMaybes)

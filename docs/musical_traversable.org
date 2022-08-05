@@ -1,6 +1,8 @@
 #+TITLE: Musical Traversable
 
 * Musical Traversables
+    A musical traversable is a traversable
+
 Scales and chords are musical traversables
 
 A musical traversable is either abstract or concrete (refers to things that can and cannot be played)

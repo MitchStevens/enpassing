@@ -1,5 +1,7 @@
 module Music.Theory.Semitones where
 
+import Data.Function (on)
+
 mod12 :: Integral n => n -> n
 mod12 x = x `mod` 12
 
@@ -10,10 +12,13 @@ class Semitones t where
   steps :: t -> Int
 
 instance Semitones () where
-  steps () = 0
+  steps _ = 0
 
 instance Semitones Int where
   steps = id
+
+equiv :: Semitones t => t -> t -> Bool
+equiv = (==) `on` steps
 
 {-
   x `diff` y - y `diff` x == 0
@@ -21,5 +26,11 @@ instance Semitones Int where
 diff :: Semitones t => t -> t -> Int
 x `diff` y = steps x - steps y
 
-numOctaves :: (Semitones a) => a -> Int
-numOctaves = (`div` 12) . steps
+getOctave :: Semitones a => a -> Int
+getOctave = div12 . steps
+
+getIntegerPitchClass :: Semitones a => a -> Int
+getIntegerPitchClass = mod12 . steps
+
+octaveEq :: Semitones t => t -> t -> Bool
+x `octaveEq` y = mod12 (x `diff` y) == 0
